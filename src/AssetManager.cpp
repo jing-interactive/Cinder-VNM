@@ -1,0 +1,150 @@
+#include "AssetManager.h"
+#include "cinder/app/App.h"
+#include "cinder/ImageIo.h"
+#include "cinder/Function.h"
+#include "cinder/Utilities.h"
+#include "cinder/ObjLoader.h"
+#include "cinder/Log.h"
+#include <map>
+
+using namespace std;
+using namespace ci;
+using namespace ci::app;
+
+namespace
+{
+    template <typename T> 
+    T& getAssetResource(const string& relativeName, function<T(const string&, const string&)> loadFunc, const string& relativeNameB = "")
+    {
+        typedef map<string, T> MapType;
+        static MapType sMap;
+        auto it = sMap.find(relativeName);
+        if (it != sMap.end())
+        {
+            return it->second;
+        }
+        CI_LOG_V( "Loading: " << relativeName << " " << relativeNameB);
+
+        try
+        {
+            fs::path aPath = getAssetPath("") / relativeName;
+            fs::path bPath = getAssetPath("") / relativeNameB;
+            return sMap[relativeName] = loadFunc(aPath.string(), bPath.string());
+        }
+        catch (Exception& e)
+        {
+            CI_LOG_EXCEPTION( "getAssetResource", e);
+            throw;
+        }
+    }
+}
+
+namespace am
+{
+    static SurfaceRef loadSurface(const string& absoluteName, const string&)
+    {
+        auto source = loadImage(absoluteName);
+        return Surface::create(source);
+    }
+
+    SurfaceRef& surface(const string& relativeName)
+    {
+        return getAssetResource<SurfaceRef>(relativeName, loadSurface);
+    }
+
+    static gl::TextureRef loadTexture(const string& absoluteName, const string&)
+    {
+        auto source = loadImage(absoluteName);
+        return gl::Texture::create(source);
+    }
+
+    gl::TextureRef& texture(const string& relativeName)
+    {
+        return getAssetResource<gl::TextureRef>(relativeName, loadTexture);
+    }
+
+    static TriMeshRef loadTriMesh(const string& absoluteName, const string&)
+    {
+        auto source = DataSourcePath::create(absoluteName);
+        auto ext = fs::path(absoluteName).extension();
+        if (ext == ".obj")
+        {
+            ObjLoader loader( source );
+            return TriMesh::create(loader);
+        }
+        else if (ext == ".msh")
+        {
+            auto mesh = TriMesh::create();
+            mesh->read(source);
+            return mesh;
+        }
+        else
+        {
+            CI_LOG_W( "Unsupported mesh format: " << absoluteName );
+            return nullptr;
+        }
+    }
+
+    TriMeshRef& triMesh(const string& relativeName)
+    {
+        return getAssetResource<TriMeshRef>(relativeName, loadTriMesh);
+    }
+
+    static gl::VboMeshRef loadVboMesh(const string& absoluteName, const string&)
+    {
+        gl::VboMesh::Layout layout;
+        auto triMesh = loadTriMesh(absoluteName, "");
+        return gl::VboMesh::create(*triMesh);
+    }
+
+    gl::VboMeshRef& vboMesh(const string& relativeName)
+    {
+        return getAssetResource<gl::VboMeshRef>(relativeName, loadVboMesh);
+    }
+
+    static gl::GlslProgRef loadGlslProg(const string& vsAbsoluteName, const string& fsAbsoluteName)
+    {
+        auto vs = DataSourcePath::create(vsAbsoluteName);
+        auto fs = DataSourcePath::create(fsAbsoluteName);
+
+        return gl::GlslProg::create(vs, fs);
+    }
+
+    gl::GlslProgRef& glslProg(const string& vsFileName, const string& fsFileName)
+    {
+        return getAssetResource<gl::GlslProgRef>(vsFileName, loadGlslProg, fsFileName);
+    }
+
+    static string loadStr(const string& absoluteName, const string&)
+    {
+        return loadString(DataSourcePath::create(absoluteName));
+    }
+
+    string& str(const string& relativeName)
+    {
+        return getAssetResource<string>(relativeName, loadStr);
+    }
+
+    static vector<string> loadFiles(const string& absoluteFolderName, const string&)
+    {
+        vector<string> files;
+        fs::directory_iterator kEnd;
+        for (fs::directory_iterator it(absoluteFolderName); it != kEnd; ++it)
+        {
+            if (fs::is_regular_file(*it) && it->path().extension() != ".db" 
+                && it->path().extension() != ".DS_Store")
+            {
+#ifdef _DEBUG
+                //console() << it->path() << endl;
+#endif
+                files.push_back(it->path().generic_string());
+            }
+        }
+        return files;
+    }
+
+    vector<string> files(const string& relativeFolderName)
+    {
+        return getAssetResource<vector<string>>(relativeFolderName, loadFiles);
+    }
+}
