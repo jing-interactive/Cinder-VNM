@@ -18,7 +18,8 @@ namespace
     {
         typedef map<string, T> MapType;
         static MapType sMap;
-        auto it = sMap.find(relativeName);
+        static T emptyResource;
+        auto it = sMap.find(relativeName+relativeNameB);
         if (it != sMap.end())
         {
             return it->second;
@@ -29,12 +30,12 @@ namespace
         {
             fs::path aPath = getAssetPath("") / relativeName;
             fs::path bPath = getAssetPath("") / relativeNameB;
-            return sMap[relativeName] = loadFunc(aPath.string(), bPath.string());
+            return sMap[relativeName+relativeNameB] = loadFunc(aPath.string(), bPath.string());
         }
         catch (Exception& e)
         {
             CI_LOG_EXCEPTION( "getAssetResource", e);
-            throw;
+            return emptyResource;
         }
     }
 }
@@ -55,7 +56,9 @@ namespace am
     static gl::TextureRef loadTexture(const string& absoluteName, const string&)
     {
         auto source = loadImage(absoluteName);
-        return gl::Texture::create(source);
+        auto format = gl::Texture2d::Format().loadTopDown();
+
+        return gl::Texture::create(source, format);
     }
 
     gl::TextureRef& texture(const string& relativeName)
@@ -67,22 +70,33 @@ namespace am
     {
         auto source = DataSourcePath::create(absoluteName);
         auto ext = fs::path(absoluteName).extension();
+        TriMeshRef mesh;
+        
         if (ext == ".obj")
         {
             ObjLoader loader( source );
-            return TriMesh::create(loader);
+            mesh = TriMesh::create(loader);
         }
         else if (ext == ".msh")
         {
-            auto mesh = TriMesh::create();
+            mesh = TriMesh::create();
             mesh->read(source);
-            return mesh;
         }
         else
         {
             CI_LOG_W( "Unsupported mesh format: " << absoluteName );
             return nullptr;
         }
+        
+        if( !mesh->hasNormals() ) {
+            mesh->recalculateNormals();
+        }
+        
+        if( ! mesh->hasTangents() ) {
+            mesh->recalculateTangents();
+        }
+        
+        return mesh;
     }
 
     TriMeshRef& triMesh(const string& relativeName)
