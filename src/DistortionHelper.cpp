@@ -19,24 +19,25 @@
 using namespace ci;
 
 static const char* GenericFragShaderSrc =
-"#version 150\n"
+//"#version 150\n"
+"precision highp float;"
 "\n"
-"out vec4 oColor;\n"
+//"out vec4 oColor;\n"
 "uniform sampler2D uTex0;\n"
-"in vec2	TexCoord;\n"
+"varying vec2	TexCoord;\n"
 "void main( void )\n"
 "{\n"
-"    oColor = texture( uTex0, TexCoord.st );\n"
+"    gl_FragColor = texture( uTex0, TexCoord.st );\n"
 "}";
 
 static const char* GenericVertShaderSrc =
-"#version 150\n"
+//"#version 150\n"
 "\n"
 "uniform mat4	ciModelViewProjection;\n"
 "\n"
-"in vec4		ciPosition;\n"
-"in vec2		ciTexCoord0;\n"
-"out highp vec2	TexCoord;\n"
+"attribute vec4		ciPosition;\n"
+"attribute vec2		ciTexCoord0;\n"
+"varying highp vec2	TexCoord;\n"
 "\n"
 "void main( void )\n"
 "{\n"
@@ -45,7 +46,8 @@ static const char* GenericVertShaderSrc =
 "}\n";
 
 static const char* PostProcessFragShaderSrc =
-"#version 150\n"
+//"#version 150\n"
+"precision highp float;"
 "uniform vec2 LensCenter;\n"
 "uniform vec2 ScreenCenter;\n"
 "uniform vec2 Scale;\n"
@@ -53,8 +55,8 @@ static const char* PostProcessFragShaderSrc =
 "uniform vec4 HmdWarpParam;\n"
 "uniform sampler2D uTex0;\n"
 "\n"
-"in vec2 TexCoord;\n"
-"out vec4 oColor;\n"
+"varying vec2 TexCoord;\n"
+//"out vec4 oColor;\n"
 "\n"
 "vec2 HmdWarp(vec2 in01)\n"
 "{\n"
@@ -68,15 +70,16 @@ static const char* PostProcessFragShaderSrc =
 "{\n"
 "   vec2 tc = HmdWarp(TexCoord.st);\n"
 "   if (!all(equal(clamp(tc, ScreenCenter-vec2(0.25,0.5), ScreenCenter+vec2(0.25,0.5)), tc)))\n"
-"       oColor = vec4(0,0,0,1);\n"
+"       gl_FragColor = vec4(0,0,0,1);\n"
 "   else\n"
-"       oColor = texture(uTex0, tc);\n"
+"       gl_FragColor = texture2D(uTex0, tc);\n"
 "}\n";
 
 
 // Shader with lens distortion and chromatic aberration correction.
 static const char* PostProcessFullFragShaderSrc =
-"#version 150\n"
+//"#version 150\n"
+"precision highp float;"
 "uniform vec2 LensCenter;\n"
 "uniform vec2 ScreenCenter;\n"
 "uniform vec2 Scale;\n"
@@ -85,8 +88,8 @@ static const char* PostProcessFullFragShaderSrc =
 "uniform vec4 ChromAbParam;\n"
 "uniform sampler2D uTex0;\n"
 "\n"
-"in vec2 TexCoord;\n"
-"out vec4 oColor;\n"
+"varying vec2 TexCoord;\n"
+//"out vec4 oColor;\n"
 "\n"
 // Scales input texture coordinates for distortion.
 // ScaleIn maps texture coordinates to Scales to ([-1, 1]), although top/bottom will be
@@ -103,23 +106,23 @@ static const char* PostProcessFullFragShaderSrc =
 "   vec2 tcBlue = LensCenter + Scale * thetaBlue;\n"
 "   if (!all(equal(clamp(tcBlue, ScreenCenter-vec2(0.25,0.5), ScreenCenter+vec2(0.25,0.5)), tcBlue)))\n"
 "   {\n"
-"       oColor = vec4(0);\n"
+"       gl_FragColor = vec4(0);\n"
 "       return;\n"
 "   }\n"
 "   \n"
 "   // Now do blue texture lookup.\n"
-"   float blue = texture(uTex0, tcBlue).b;\n"
+"   float blue = texture2DuTex0, tcBlue).b;\n"
 "   \n"
 "   // Do green lookup (no scaling).\n"
 "   vec2  tcGreen = LensCenter + Scale * theta1;\n"
-"   vec4  center = texture(uTex0, tcGreen);\n"
+"   vec4  center = texture2D(uTex0, tcGreen);\n"
 "   \n"
 "   // Do red scale and lookup.\n"
 "   vec2  thetaRed = theta1 * (ChromAbParam.x + ChromAbParam.y * rSq);\n"
 "   vec2  tcRed = LensCenter + Scale * thetaRed;\n"
-"   float red = texture(uTex0, tcRed).r;\n"
+"   float red = texture2D(uTex0, tcRed).r;\n"
 "   \n"
-"   oColor = vec4(red, center.g, blue, 1);\n"
+"   gl_FragColor = vec4(red, center.g, blue, 1);\n"
 "}\n";
 
 
