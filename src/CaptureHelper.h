@@ -23,7 +23,22 @@ struct CaptureHelper
             capture->start();
             size = capture->getSize();
             
-            AppBase::get()->getSignalUpdate().connect(std::bind(&CaptureHelper::update, this));
+            auto updateFn = [this]
+            {
+                if ( capture && capture->checkNewFrame() )
+                {
+                    surface = *capture->getSurface();
+                    if ( ! texture ) {
+                        // Capture images come back as top-down, and it's more efficient to keep them that way
+                        texture = gl::Texture::create( surface, gl::Texture::Format().loadTopDown() );
+                    }
+                    else {
+                        texture->update( surface );
+                    }
+                }
+            };
+            App::get()->getSignalUpdate().connect(updateFn);
+            
         }
         catch ( ci::Exception &exc ) {
             CI_LOG_EXCEPTION( "Failed to init capture ", exc );
@@ -45,17 +60,7 @@ private:
     
     CaptureRef      capture;
 
-    void update()
+    void update2()
     {
-        if ( capture && capture->checkNewFrame() ) {
-            surface = *capture->getSurface();
-            if ( ! texture ) {
-                // Capture images come back as top-down, and it's more efficient to keep them that way
-                texture = gl::Texture::create( surface, gl::Texture::Format().loadTopDown() );
-            }
-            else {
-                texture->update( surface );
-            }
-        }
     }
 };

@@ -16,17 +16,15 @@ struct MotionHelper
         
         MotionManager::enable( 1000.0f/*, MotionManager::SensorMode::Accelerometer*/ );
         
-        AppBase::get()->getSignalUpdate().connect(std::bind(&MotionHelper::update, this));
-    }
-    
-private:
-    
-    void update()
-    {
-        if ( MotionManager::isEnabled() )
+        auto updateFn = [this]
         {
-            deviceRotation = inverse( MotionManager::getRotationMatrix() );
-        }
+            if ( MotionManager::isEnabled() )
+            {
+                deviceRotation = inverse( MotionManager::getRotationMatrix() );
+            }
+        };
+        
+        App::get()->getSignalUpdate().connect(updateFn);
     }
     
 };

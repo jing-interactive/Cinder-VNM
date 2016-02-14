@@ -18,7 +18,7 @@ namespace
     {
         typedef map<string, T> MapType;
         static MapType sMap;
-        static T emptyResource;
+        static T nullResource;
         auto it = sMap.find(relativeName+relativeNameB);
         if (it != sMap.end())
         {
@@ -28,14 +28,16 @@ namespace
 
         try
         {
-            fs::path aPath = getAssetPath("") / relativeName;
-            fs::path bPath = getAssetPath("") / relativeNameB;
-            return sMap[relativeName+relativeNameB] = loadFunc(aPath.string(), bPath.string());
+            auto aPath = getAssetPath("") / relativeName;
+            auto bPath = getAssetPath("") / relativeNameB;
+            
+            auto resource = loadFunc(aPath.string(), bPath.string());
+            return sMap[relativeName+relativeNameB] = resource;
         }
         catch (Exception& e)
         {
             CI_LOG_EXCEPTION( "getAssetResource", e);
-            return emptyResource;
+            return nullResource;
         }
     }
 }
