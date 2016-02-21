@@ -2,6 +2,7 @@
 
 #include "cinder/MotionManager.h"
 #include "cinder/app/App.h"
+#include "cinder/Log.h"
 
 using namespace ci;
 using namespace ci::app;

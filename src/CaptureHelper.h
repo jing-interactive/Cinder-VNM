@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cinder/Capture.h"
+#include "cinder/Log.h"
 
 using namespace ci;
 using namespace ci::app;
