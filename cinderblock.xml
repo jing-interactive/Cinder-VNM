@@ -4,12 +4,12 @@
 	name="vnm"
 	id="org.vnm.utils"
 	author="Vinjn Zhang"
-	license="BSD"
+	license="MIT"
 	summary="Implements the utils"
 	core="false"
 	>
 	<sourcePattern>src/*.cpp</sourcePattern>
-	<headerPattern>src/*.h</headerPattern>
+	<headerPattern>src/*.h;src/item.def</headerPattern>
 	<includePath>src</includePath>
 </block>
 </cinder>
