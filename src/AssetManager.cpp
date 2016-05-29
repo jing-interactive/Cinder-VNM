@@ -120,10 +120,16 @@ namespace am
 
     static gl::GlslProgRef loadGlslProg(const string& vsAbsoluteName, const string& fsAbsoluteName)
     {
-        auto vs = DataSourcePath::create(vsAbsoluteName);
-        auto fs = DataSourcePath::create(fsAbsoluteName);
-
-        return gl::GlslProg::create(vs, fs);
+        gl::GlslProg::Format format;
+#if defined( CINDER_GL_ES )
+        format.version(300); // es 3.0
+#else
+        format.version(150); // gl 3.2
+#endif
+        format.vertex(DataSourcePath::create(vsAbsoluteName));
+        format.fragment(DataSourcePath::create(fsAbsoluteName));
+                
+        return gl::GlslProg::create(format);
     }
 
     gl::GlslProgRef& glslProg(const string& vsFileName, const string& fsFileName)
