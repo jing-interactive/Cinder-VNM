@@ -31,7 +31,9 @@ struct CaptureHelper
                     surface = *capture->getSurface();
                     if ( ! texture ) {
                         // Capture images come back as top-down, and it's more efficient to keep them that way
-                        texture = gl::Texture::create( surface, gl::Texture::Format().loadTopDown() );
+                        gl::Texture::Format format;
+//                        format.loadTopDown();
+                        texture = gl::Texture::create( surface, format);
                     }
                     else {
                         texture->update( surface );
