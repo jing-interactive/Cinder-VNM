@@ -17,10 +17,10 @@ struct CaptureHelper
         return texture != nullptr;
     }
     
-    void setup()
+    void setup(int32_t width = 640, int32_t height = 480, const Capture::DeviceRef device = Capture::DeviceRef() )
     {
         try {
-            capture = Capture::create( 640, 480 );
+            capture = Capture::create( width, height, device );
             capture->start();
             size = capture->getSize();
             
@@ -63,7 +63,4 @@ private:
     
     CaptureRef      capture;
 
-    void update2()
-    {
-    }
 };
