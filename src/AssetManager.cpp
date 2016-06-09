@@ -5,6 +5,7 @@
 #include "cinder/Utilities.h"
 #include "cinder/ObjLoader.h"
 #include "cinder/Log.h"
+#include "cinder/Function.h"
 #include <map>
 
 using namespace std;
@@ -147,7 +148,7 @@ namespace am
         return getAssetResource<string>(relativeName, loadStr);
     }
 
-    static vector<string> loadFiles(const string& absoluteFolderName, const string&)
+    static vector<string> loadPaths(const string& absoluteFolderName, const string&, bool isLongMode)
     {
         vector<string> files;
         fs::directory_iterator kEnd;
@@ -159,14 +160,22 @@ namespace am
 #ifdef _DEBUG
                 //console() << it->path() << endl;
 #endif
-                files.push_back(it->path().generic_string());
+                files.push_back(isLongMode ?
+                                it->path().string() :
+                                it->path().filename().string());
             }
         }
         return files;
     }
 
-    vector<string> files(const string& relativeFolderName)
+    vector<string> longPaths(const string& relativeFolderName)
     {
-        return getAssetResource<vector<string>>(relativeFolderName, loadFiles);
+        return getAssetResource<vector<string>>(relativeFolderName, bind(loadPaths, placeholders::_1, placeholders::_2, true));
     }
+    
+    vector<string> shortPaths(const string& relativeFolderName)
+    {
+        return getAssetResource<vector<string>>(relativeFolderName, bind(loadPaths, placeholders::_1, placeholders::_2, false));
+    }
+    
 }
