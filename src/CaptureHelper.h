@@ -2,6 +2,7 @@
 
 #include "cinder/Capture.h"
 #include "cinder/Log.h"
+#include "cinder/ip/flip.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -11,16 +12,17 @@ struct CaptureHelper
     Surface         surface;
     gl::TextureRef  texture;
     ivec2           size;
+    bool            flip;
     
     bool isReady()
     {
         return texture != nullptr;
     }
     
-    bool isDirty()
+    bool checkNewFrame()
     {
-        bool ret = dirty;
-        dirty = false;
+        bool ret = hasNewFrame;
+        hasNewFrame = false;
         return ret;
     }
     
@@ -30,14 +32,17 @@ struct CaptureHelper
         {
             capture = Capture::create(width, height, device);
             capture->start();
-            dirty = false;
+            hasNewFrame = false;
+            flip = false;
             
             auto updateFn = [this]
             {
                 if (capture && capture->checkNewFrame())
                 {
-                    dirty = true;
+                    hasNewFrame = true;
                     surface = *capture->getSurface();
+                    if (flip) ip::flipHorizontal(&surface);
+
                     size = surface.getSize();
                     
                     if (!texture)
@@ -77,6 +82,6 @@ struct CaptureHelper
 private:
     
     CaptureRef  capture;
-    bool        dirty;
+    bool        hasNewFrame;
 
 };
