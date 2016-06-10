@@ -39,11 +39,12 @@ struct CaptureHelper
             {
                 if (capture && capture->checkNewFrame())
                 {
-                    hasNewFrame = true;
                     surface = *capture->getSurface();
                     if (flip) ip::flipHorizontal(&surface);
 
                     size = surface.getSize();
+                    
+                    hasNewFrame = true;
                     
                     if (!texture)
                     {
