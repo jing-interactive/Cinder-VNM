@@ -1,5 +1,4 @@
 ﻿#include "MiniConfig.h"
-#include <cinder/xml.h>
 #include <cinder/Utilities.h>
 #include <cinder/app/App.h>
 #include "CinderImGui.h"
@@ -62,18 +61,13 @@ namespace
             writeConfig();
         }
         
-        if (ui::Button("Quit"))
-        {
-            App::get()->quit();
-        }
-        
         if (ui::Button("Save image"))
         {
             auto windowSurf = copyWindowSurface();
 #ifdef CINDER_COCOA_TOUCH
             cocoa::writeToSavedPhotosAlbum(windowSurf);
 #else
-            fs::path writePath = getDocumentsDirectory() / ("FaceVFX_f" + toString(getElapsedFrames()) + ".png");
+            fs::path writePath = getAppPath() / ("screenshot_" + toString(getElapsedFrames()) + ".png");
             writeImage(writePath, windowSurf);
 #endif
         }
@@ -84,7 +78,11 @@ namespace
 #undef ITEM_DEF_MINMAX
 #undef ITEM_DEF
 #undef GROUP_DEF
-        //    params->addSeparator();
+
+        if (ui::Button("Quit"))
+        {
+            App::get()->quit();
+        }
     }
 }
 
