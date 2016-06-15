@@ -22,7 +22,7 @@ struct CaptureHelper
     bool checkNewFrame()
     {
         bool ret = hasNewFrame;
-        hasNewFrame = false;
+        if (hasNewFrame) hasNewFrame = false;
         return ret;
     }
     
@@ -30,9 +30,10 @@ struct CaptureHelper
     {
         try
         {
+            hasNewFrame = false;
+
             capture = Capture::create(width, height, device);
             capture->start();
-            hasNewFrame = false;
             flip = false;
             
             auto updateFn = [this]
@@ -43,8 +44,6 @@ struct CaptureHelper
                     if (flip) ip::flipHorizontal(&surface);
 
                     size = surface.getSize();
-                    
-                    hasNewFrame = true;
                     
                     if (!texture)
                     {
@@ -57,6 +56,8 @@ struct CaptureHelper
                     {
                         texture->update( surface );
                     }
+                    
+                    hasNewFrame = true;
                 }
             };
             App::get()->getSignalUpdate().connect(updateFn);

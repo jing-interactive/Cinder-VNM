@@ -19,18 +19,6 @@ using namespace std;
 namespace
 {
     const string kConfigFileName = "MiniConfig.xml";
-
-    void revertToDefaultValues()
-    {
-#define GROUP_DEF(grp)
-#define ITEM_DEF(type, var, default) var = default;
-#define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
-#include "item.def"
-#undef ITEM_DEF_MINMAX
-#undef ITEM_DEF
-#undef GROUP_DEF
-        console() << "MiniConfig reverted to default values" << endl;
-    }
 }
 
 void readConfig()
@@ -108,6 +96,18 @@ void writeConfig()
 	catch( ... ) {
 		console() << "[Warning] Fails to write to " << configPath.string() <<endl;
 	}
+}
+
+void revertToDefaultValues()
+{
+#define GROUP_DEF(grp)
+#define ITEM_DEF(type, var, default) var = default;
+#define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
+#include "item.def"
+#undef ITEM_DEF_MINMAX
+#undef ITEM_DEF
+#undef GROUP_DEF
+    console() << "MiniConfig reverted to default values" << endl;
 }
 
 void setupConfigUI(cinder::params::InterfaceGl* params)

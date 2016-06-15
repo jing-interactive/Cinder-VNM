@@ -33,6 +33,7 @@ ITEM_DEF_MINMAX(float, delay, 3.0f, 0.0f, 10.0f)
 
 void readConfig();
 void writeConfig();
+void revertToDefaultValues();
 
 namespace cinder { namespace params {
 class InterfaceGl;
