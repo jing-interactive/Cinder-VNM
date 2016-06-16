@@ -8,8 +8,9 @@
 	summary="Implements the utils"
 	core="false"
 	>
-	<sourcePattern>src/*.cpp;src/*.h</sourcePattern>
-	<headerPattern>src/*.h</headerPattern>
-	<includePath>src</includePath>
+	<sourcePattern>src/*.*</sourcePattern>
+	<sourcePattern>include/*.*</sourcePattern>
+	<headerPattern>include/*.*</headerPattern>
+	<includePath>include</includePath>
 </block>
 </cinder>

@@ -6,7 +6,7 @@
 //
 //
 
-#include "DistortionHelper.h"
+#include "../include/DistortionHelper.h"
 
 #include "cinder/Utilities.h"
 #include "cinder/app/App.h"

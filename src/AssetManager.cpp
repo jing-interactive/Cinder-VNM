@@ -1,4 +1,4 @@
-#include "AssetManager.h"
+#include "../include/AssetManager.h"
 #include "cinder/app/App.h"
 #include "cinder/ImageIo.h"
 #include "cinder/Function.h"

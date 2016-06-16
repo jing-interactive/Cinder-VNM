@@ -1,4 +1,4 @@
-﻿#include "MiniConfig.h"
+﻿#include "../include/MiniConfig.h"
 #include <cinder/xml.h>
 #include <cinder/Utilities.h>
 #include <cinder/app/App.h>
