@@ -66,7 +66,7 @@ namespace
             writeConfig();
         }
         
-        if (ui::Button("Save image"))
+        if (ui::Button("Save Image"))
         {
             auto windowSurf = copyWindowSurface();
 #ifdef CINDER_COCOA_TOUCH
