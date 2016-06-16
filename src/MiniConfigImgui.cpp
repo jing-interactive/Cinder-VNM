@@ -1,7 +1,12 @@
-﻿#include "MiniConfig.h"
+﻿#include "../include/MiniConfig.h"
+#include "Cinder-ImGui/include/CinderImGui.h"
+
 #include <cinder/Utilities.h>
 #include <cinder/app/App.h>
-#include "CinderImGui.h"
+
+#ifndef CINDER_COCOA_TOUCH
+#include <cinder/ImageIo.h>
+#endif
 
 using namespace ci;
 using namespace ci::app;
