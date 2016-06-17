@@ -13,6 +13,8 @@ struct CaptureHelper
     gl::TextureRef  texture;
     ivec2           size;
     bool            flip;
+    std::string     deviceName;
+    bool            isFrontCamera;
     
     bool isReady()
     {
@@ -35,6 +37,8 @@ struct CaptureHelper
             capture = Capture::create(width, height, device);
             capture->start();
             flip = false;
+            deviceName = capture->getDevice()->getName();
+            isFrontCamera = (deviceName.find("Front") != std::string::npos);
             
             auto updateFn = [this]
             {
