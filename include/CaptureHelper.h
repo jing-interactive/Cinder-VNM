@@ -14,7 +14,7 @@ struct CaptureHelper
     ivec2           size;
     bool            flip;
     std::string     deviceName;
-    bool            isFrontCamera;
+    bool            isBackCamera;
     
     bool isReady()
     {
@@ -38,7 +38,7 @@ struct CaptureHelper
             capture->start();
             flip = false;
             deviceName = capture->getDevice()->getName();
-            isFrontCamera = (deviceName.find("Front") != std::string::npos);
+            isBackCamera = (deviceName.find("Back") != std::string::npos);
             
             auto updateFn = [this]
             {
