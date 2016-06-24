@@ -62,11 +62,13 @@ namespace am
         auto loadTexture = [&format](const string& absoluteName, const string&) -> shared_ptr<T>
         {
             auto ext = fs::path(absoluteName).extension();
+#if !defined( CINDER_GL_ES ) || defined( CINDER_GL_ANGLE )
             if (ext == ".dds")
             {
                 auto source = DataSourcePath::create(absoluteName);
                 return T::createFromDds(source, format);
             }
+#endif
             if (ext == ".ktx")
             {
                 auto source = DataSourcePath::create(absoluteName);
