@@ -9,7 +9,6 @@
 	core="false"
 	>
 	<sourcePattern>src/*.*</sourcePattern>
-	<sourcePattern>include/*.*</sourcePattern>
 	<headerPattern>include/*.*</headerPattern>
 	<includePath>include</includePath>
 </block>
