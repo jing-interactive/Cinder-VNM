@@ -10,7 +10,7 @@
 
 using namespace std;
 using namespace ci;
-using namespace ci::app;
+using namespace app;
 
 namespace
 {
@@ -56,17 +56,41 @@ namespace am
         return getAssetResource<SurfaceRef>(relativeName, loadSurface);
     }
 
-    static gl::TextureRef loadTexture(const string& absoluteName, const string&)
+    template <typename T>
+    shared_ptr<T>& texture(const string& relativeName, const typename T::Format& format)
     {
-        auto source = loadImage(absoluteName);
-        auto format = gl::Texture2d::Format().loadTopDown();
-
-        return gl::Texture::create(source, format);
+        auto loadTexture = [&format](const string& absoluteName, const string&) -> shared_ptr<T>
+        {
+            auto ext = fs::path(absoluteName).extension();
+            if (ext == ".dds")
+            {
+                auto source = DataSourcePath::create(absoluteName);
+                return T::createFromDds(source, format);
+            }
+            if (ext == ".ktx")
+            {
+                auto source = DataSourcePath::create(absoluteName);
+                return T::createFromKtx(source, format);
+            }
+            auto source = loadImage(absoluteName);
+            return T::create(source, format);
+        };
+        return getAssetResource<shared_ptr<T>>(relativeName, loadTexture);
     }
 
-    gl::TextureRef& texture(const string& relativeName)
+    //gl::Texture1dRef& texture1d(const std::string& relativeName, const gl::Texture1d::Format& format)
+    //{
+    //    return texture<gl::Texture1d>(relativeName, format);
+    //}
+
+    gl::Texture2dRef& texture2d(const std::string& relativeName, const gl::Texture2d::Format& format)
     {
-        return getAssetResource<gl::TextureRef>(relativeName, loadTexture);
+        return texture<gl::Texture2d>(relativeName, format);
+    }
+
+    gl::TextureCubeMapRef& textureCubeMap(const std::string& relativeName, const gl::TextureCubeMap::Format& format)
+    {
+        return texture<gl::TextureCubeMap>(relativeName, format);
     }
 
     static TriMeshRef loadTriMesh(const string& absoluteName, const string&)

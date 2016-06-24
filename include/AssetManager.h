@@ -10,8 +10,12 @@ namespace am // am -> asset manager
 {
     ci::SurfaceRef& surface(const std::string& relativeName);
 
-    ci::gl::TextureRef& texture(const std::string& relativeName);
+    // Supports jpg, png, bmp, tga, dds, ktx etc.
+    //ci::gl::Texture1dRef& texture1d(const std::string& relativeName, const ci::gl::Texture1d::Format& format = ci::gl::Texture1d::Format());
+    ci::gl::Texture2dRef& texture2d(const std::string& relativeName, const ci::gl::Texture2d::Format& format = ci::gl::Texture2d::Format());
+    ci::gl::TextureCubeMapRef& textureCubeMap(const std::string& relativeName, const ci::gl::TextureCubeMap::Format& format = ci::gl::TextureCubeMap::Format());
 
+    // Supports obj, msh.
     ci::TriMeshRef& triMesh(const std::string& relativeName);
 
     ci::gl::VboMeshRef& vboMesh(const std::string& relativeName);
