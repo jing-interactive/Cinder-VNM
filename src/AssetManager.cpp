@@ -6,6 +6,9 @@
 #include "cinder/ObjLoader.h"
 #include "cinder/Log.h"
 #include "cinder/Function.h"
+#include "cinder/ip/checkerboard.h"
+#include "cinder/gl/Shader.h"
+#include "cinder/GeomIo.h"
 #include <map>
 
 using namespace std;
@@ -29,8 +32,10 @@ namespace
 
         try
         {
-            auto aPath = getAssetPath("") / relativeName;
-            auto bPath = getAssetPath("") / relativeNameB;
+            auto aPath = getAssetPath(relativeName);
+            if (aPath.empty()) aPath = relativeName;
+            auto bPath = getAssetPath(relativeNameB);
+            if (bPath.empty()) bPath = relativeNameB;
             
             auto resource = loadFunc(aPath.string(), bPath.string());
             return sMap[relativeName+relativeNameB] = resource;
@@ -61,6 +66,12 @@ namespace am
     {
         auto loadTexture = [&format](const string& absoluteName, const string&) -> shared_ptr<T>
         {
+            if (absoluteName == "checkerboard")
+            {
+                auto source = ip::checkerboard(512, 512);
+                return T::create(source, format);
+            }
+            
             auto ext = fs::path(absoluteName).extension();
 #if !defined( CINDER_GL_ES ) || defined( CINDER_GL_ANGLE )
             if (ext == ".dds")
@@ -97,6 +108,33 @@ namespace am
 
     static TriMeshRef loadTriMesh(const string& absoluteName, const string&)
     {
+#define ENTRY(name)  if (absoluteName == #name) return TriMesh::create(geom::name());
+        ENTRY(Rect);
+        ENTRY(RoundedRect);
+        ENTRY(Cube);
+        ENTRY(Icosahedron);
+        ENTRY(Icosphere);
+        ENTRY(Teapot);
+        ENTRY(Circle);
+        ENTRY(Ring);
+        ENTRY(Sphere);
+        ENTRY(Capsule);
+        ENTRY(Torus);
+        ENTRY(TorusKnot);
+        ENTRY(Cylinder);
+        ENTRY(Plane);
+        ENTRY(WireCapsule);
+        ENTRY(WireCircle);
+        ENTRY(WireRoundedRect);
+        ENTRY(WireCube);
+        ENTRY(WireCylinder);
+        ENTRY(WireCone);
+        ENTRY(WireIcosahedron);
+        ENTRY(WirePlane);
+        ENTRY(WireSphere);
+        ENTRY(WireTorus);
+#undef ENTRY
+        
         auto source = DataSourcePath::create(absoluteName);
         auto ext = fs::path(absoluteName).extension();
         TriMeshRef mesh;
@@ -133,20 +171,28 @@ namespace am
         return getAssetResource<TriMeshRef>(relativeName, loadTriMesh);
     }
 
-    static gl::VboMeshRef loadVboMesh(const string& absoluteName, const string&)
-    {
-        gl::VboMesh::Layout layout;
-        auto triMesh = loadTriMesh(absoluteName, "");
-        return gl::VboMesh::create(*triMesh);
-    }
-
     gl::VboMeshRef& vboMesh(const string& relativeName)
     {
-        return getAssetResource<gl::VboMeshRef>(relativeName, loadVboMesh);
+        auto tri = triMesh(relativeName);
+        auto loader = [&tri](const string& absoluteName, const string&) -> gl::VboMeshRef
+        {
+            if (!tri)
+            {
+                gl::VboMesh::Layout layout;
+                tri = loadTriMesh(absoluteName, "");
+            }
+            return gl::VboMesh::create(*tri);
+        };
+        return getAssetResource<gl::VboMeshRef>(relativeName, loader);
     }
 
     static gl::GlslProgRef loadGlslProg(const string& vsAbsoluteName, const string& fsAbsoluteName)
     {
+        if (vsAbsoluteName == "texture") return gl::getStockShader(gl::ShaderDef().texture());
+        if (vsAbsoluteName == "color") return gl::getStockShader(gl::ShaderDef().color());
+        if (vsAbsoluteName == "color+texture") return gl::getStockShader(gl::ShaderDef().color().texture());
+        if (vsAbsoluteName == "lambert") return gl::getStockShader(gl::ShaderDef().lambert());
+        
         gl::GlslProg::Format format;
 #if defined( CINDER_GL_ES )
         format.version(300); // es 3.0
