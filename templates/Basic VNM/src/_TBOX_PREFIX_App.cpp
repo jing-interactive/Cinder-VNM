@@ -26,7 +26,12 @@ class CinderProjectApp : public App
         auto triMesh = am::triMesh("Teapot");
         auto aabb = triMesh->calcBoundingBox();
         mMesh = gl::VboMesh::create(*triMesh);
-        mTexture = am::texture2d("checkerboard");
+
+        gl::Texture2d::Format mipFmt;
+        mipFmt.enableMipmapping( true );
+        mipFmt.setMinFilter( GL_LINEAR_MIPMAP_LINEAR );
+        mipFmt.setMagFilter( GL_LINEAR );
+        mTexture = am::texture2d("checkerboard", mipFmt);        
         
         const vec2 windowSize = toPixels( getWindowSize() );
         mCam = CameraPersp( (int32_t)windowSize.x, (int32_t)windowSize.y, 60.0f, 0.01f, 1000.0f );
