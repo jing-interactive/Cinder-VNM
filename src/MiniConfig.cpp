@@ -23,10 +23,10 @@ namespace
 
 void readConfig()
 {
-	fs::path configPath = getAssetPath("./") / kConfigFileName;
-	try
-	{
-		XmlTree tree(loadFile(configPath));
+    fs::path configPath = getAssetPath("./") / kConfigFileName;
+    try
+    {
+        XmlTree tree(loadFile(configPath));
         XmlTree group;
 
 #define GROUP_DEF(grp) group = tree.getChild(#grp);
@@ -44,21 +44,21 @@ void readConfig()
 #undef ITEM_DEF
 #undef GROUP_DEF
         console() << "Reads from " << configPath.string() << endl;
-	}
-	catch (exception& e)
+    }
+    catch (exception& e)
     {
         console() << e.what() << endl;
-		console() << "[Warning] Fails to read from " << configPath.string() << endl;
+        console() << "[Warning] Fails to read from " << configPath.string() << endl;
         revertToDefaultValues();
-		writeConfig();
-	}
+        writeConfig();
+    }
 }
 
 void writeConfig()
 {
-	fs::path configPath = getAssetPath("./") / kConfigFileName;
-	try
-	{
+    fs::path configPath = getAssetPath("./") / kConfigFileName;
+    try
+    {
         XmlTree tree = XmlTree::createDoc();
         XmlTree group;
 
@@ -91,11 +91,11 @@ void writeConfig()
 #else
         tree.write( writeFile(configPath));
 #endif
-		console() << "Writes to " << configPath.string() <<endl;
-	}
-	catch( ... ) {
-		console() << "[Warning] Fails to write to " << configPath.string() <<endl;
-	}
+        console() << "Writes to " << configPath.string() <<endl;
+    }
+    catch( ... ) {
+        console() << "[Warning] Fails to write to " << configPath.string() <<endl;
+    }
 }
 
 void revertToDefaultValues()
@@ -161,6 +161,9 @@ namespace
 
 shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
 {
+#ifdef CINDER_COCOA_TOUCH
+    return nullptr;
+#else
     ivec2 newsize = {size.x, max(size.y, getConfigUIHeight()) };
     
     auto params = params::InterfaceGl::create("MiniConfig", newsize);
@@ -182,5 +185,6 @@ params->addParam(#var, &var).min(Min).max(Max).step(step);  \
     getWindow()->getSignalPostDraw().connect(std::bind(&params::InterfaceGl::draw, params));
     
     return params;
+#endif
 }
 
