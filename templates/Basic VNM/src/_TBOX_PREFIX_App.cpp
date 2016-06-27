@@ -18,7 +18,7 @@ static void prepareAppSettings( App::Settings* settings )
     settings->setMultiTouchEnabled(false);        
 }
 
-class CinderProjectApp : public App
+class _TBOX_PREFIX_App : public App
 {
   public:
     void setup() override

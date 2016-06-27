@@ -13,4 +13,5 @@
 	<includePath>include</includePath>
 </block>
 <template>templates/Basic VNM/template.xml</template>
+<template>templates/Minimalist VNM/template.xml</template>
 </cinder>
