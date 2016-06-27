@@ -11,17 +11,17 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-class _TBOX_PREFIX_App : public App
+static void prepareAppSettings( App::Settings* settings )
+{
+    readConfig();
+    settings->setWindowSize(APP_WIDTH, APP_HEIGHT);
+    settings->setMultiTouchEnabled(false);        
+}
+
+class CinderProjectApp : public App
 {
   public:
-    void prepareSettings( Settings* settings )
-    {
-        readConfig();
-        settings->setWindowSize(APP_WIDTH, APP_HEIGHT);
-        settings->setMultiTouchEnabled(false);        
-    }
-    
-    void setup()
+    void setup() override
     {
         auto triMesh = am::triMesh("Teapot");
         auto aabb = triMesh->calcBoundingBox();
@@ -29,19 +29,26 @@ class _TBOX_PREFIX_App : public App
         mTexture = am::texture2d("checkerboard");
         
         const vec2 windowSize = toPixels( getWindowSize() );
-        mCam = CameraPersp( (int32_t)windowSize.x, (int32_t)windowSize.y, 60.0f, 0.01f, 100.0f );
+        mCam = CameraPersp( (int32_t)windowSize.x, (int32_t)windowSize.y, 60.0f, 0.01f, 1000.0f );
         mCam.lookAt( aabb.getMax(), aabb.getCenter() );
         mCamUi = CameraUi( &mCam, getWindow(), -1 );
         
-        mParams = createConfigUI({200, 200});
+        auto mParams = createConfigUI({200, 200});
+    
+        gl::enableDepth();
     }
     
-    void update()
+    void resize() override
+    {
+        mCam.setAspectRatio( getWindowAspectRatio() );
+    }
+    
+    void update() override
     {
         
     }
     
-    void draw()
+    void draw() override
     {
         gl::setMatrices( mCam );
         gl::clear( Color( 0, 0, 0 ) );
@@ -55,8 +62,6 @@ private:
     gl::Texture2dRef    mTexture;
     CameraPersp         mCam;
     CameraUi            mCamUi;
-    
-    params::InterfaceGlRef  mParams;
 };
 
-CINDER_APP( _TBOX_PREFIX_App, RendererGl )
+CINDER_APP( _TBOX_PREFIX_App, RendererGl, prepareAppSettings )
