@@ -12,4 +12,5 @@
 	<headerPattern>include/*.*</headerPattern>
 	<includePath>include</includePath>
 </block>
+<template>templates/Basic VNM/template.xml</template>
 </cinder>
