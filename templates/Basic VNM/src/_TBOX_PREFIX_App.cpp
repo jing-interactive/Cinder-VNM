@@ -17,6 +17,8 @@ class _TBOX_PREFIX_App : public App
     void prepareSettings( Settings* settings )
     {
         readConfig();
+        settings->setWindowSize(APP_WIDTH, APP_HEIGHT);
+        settings->setMultiTouchEnabled(false);        
     }
     
     void setup()
@@ -31,7 +33,7 @@ class _TBOX_PREFIX_App : public App
         mCam.lookAt( aabb.getMax(), aabb.getCenter() );
         mCamUi = CameraUi( &mCam, getWindow(), -1 );
         
-        mParams = createConfigUI();
+        mParams = createConfigUI({200, 200});
     }
     
     void update()
