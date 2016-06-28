@@ -30,6 +30,12 @@ class _TBOX_PREFIX_App : public App
             if (event.getCode() == KeyEvent::KEY_ESCAPE) quit();
         });
         
+        mGlslProg = am::glslProg(VS_NAME, FS_NAME);
+        mGlslProg->uniform("uTex0", 0);
+        mGlslProg->uniform("uTex1", 1);
+        mGlslProg->uniform("uTex2", 2);
+        mGlslProg->uniform("uTex3", 3);
+
         getWindow()->getSignalDraw().connect([&] {
             gl::setMatrices( mCam );
             gl::clear();
@@ -38,7 +44,8 @@ class _TBOX_PREFIX_App : public App
             gl::ScopedTextureBind tex1(am::texture2d(TEX1_NAME), 1);
             gl::ScopedTextureBind tex2(am::texture2d(TEX2_NAME), 2);
             gl::ScopedTextureBind tex3(am::texture2d(TEX3_NAME), 3);
-            gl::ScopedGlslProg glsl(am::glslProg(VS_NAME, FS_NAME));
+            gl::ScopedGlslProg glsl(mGlslProg);
+
             gl::draw(am::vboMesh(MESH_NAME));
         });
     }
@@ -46,6 +53,7 @@ class _TBOX_PREFIX_App : public App
 private:
     CameraPersp         mCam;
     CameraUi            mCamUi;
+    gl::GlslProgRef     mGlslProg;
 };
 
 CINDER_APP( _TBOX_PREFIX_App, RendererGl, [](App::Settings* settings) {
