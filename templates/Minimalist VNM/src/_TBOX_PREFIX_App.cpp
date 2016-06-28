@@ -25,6 +25,10 @@ class _TBOX_PREFIX_App : public App
         getWindow()->getSignalResize().connect([&] {
             mCam.setAspectRatio( getWindowAspectRatio() );
         });
+
+        getWindow()->getSignalKeyUp().connect([&](KeyEvent& event) {
+            if (event.getCode() == KeyEvent::KEY_ESCAPE) quit();
+        });
         
         getWindow()->getSignalDraw().connect([&] {
             gl::setMatrices( mCam );
