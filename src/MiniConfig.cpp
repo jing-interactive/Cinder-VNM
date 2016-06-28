@@ -23,10 +23,10 @@ namespace
 
 void readConfig()
 {
-	fs::path configPath = getAssetPath("./") / kConfigFileName;
-	try
-	{
-		XmlTree tree(loadFile(configPath));
+    fs::path configPath = getAssetPath("./") / kConfigFileName;
+    try
+    {
+        XmlTree tree(loadFile(configPath));
         XmlTree group;
 
 #define GROUP_DEF(grp) group = tree.getChild(#grp);
@@ -44,21 +44,21 @@ void readConfig()
 #undef ITEM_DEF
 #undef GROUP_DEF
         console() << "Reads from " << configPath.string() << endl;
-	}
-	catch (exception& e)
+    }
+    catch (exception& e)
     {
         console() << e.what() << endl;
-		console() << "[Warning] Fails to read from " << configPath.string() << endl;
+        console() << "[Warning] Fails to read from " << configPath.string() << endl;
         revertToDefaultValues();
-		writeConfig();
-	}
+        writeConfig();
+    }
 }
 
 void writeConfig()
 {
-	fs::path configPath = getAssetPath("./") / kConfigFileName;
-	try
-	{
+    fs::path configPath = getAssetPath("./") / kConfigFileName;
+    try
+    {
         XmlTree tree = XmlTree::createDoc();
         XmlTree group;
 
@@ -91,11 +91,11 @@ void writeConfig()
 #else
         tree.write( writeFile(configPath));
 #endif
-		console() << "Writes to " << configPath.string() <<endl;
-	}
-	catch( ... ) {
-		console() << "[Warning] Fails to write to " << configPath.string() <<endl;
-	}
+        console() << "Writes to " << configPath.string() <<endl;
+    }
+    catch( ... ) {
+        console() << "[Warning] Fails to write to " << configPath.string() <<endl;
+    }
 }
 
 void revertToDefaultValues()
@@ -108,26 +108,6 @@ void revertToDefaultValues()
 #undef ITEM_DEF
 #undef GROUP_DEF
     console() << "MiniConfig reverted to default values" << endl;
-}
-
-void setupConfigUI(cinder::params::InterfaceGl* params)
-{
-    params->addButton("SAVE", writeConfig);
-#define GROUP_DEF(grp)                  params->addSeparator(#grp);       
-#define ITEM_DEF(type, var, default)    params->addParam(#var, &var);
-#define ITEM_DEF_MINMAX(type, var, default, Min, Max)               \
-    do                                                              \
-    {                                                               \
-        type step = (Max - Min) / (type)500;                        \
-        params->addParam(#var, &var).min(Min).max(Max).step(step);  \
-    } while(0);
-#include "item.def"
-#undef ITEM_DEF_MINMAX
-#undef ITEM_DEF
-#undef GROUP_DEF
-    params->addSeparator();
-
-    getWindow()->getSignalPostDraw().connect(std::bind(&params::InterfaceGl::draw, params));
 }
 
 namespace
@@ -162,19 +142,49 @@ namespace
     {
         return 80;
     }
+
+    int getConfigUIHeight()
+    {
+        int height = kPODItemHeight * 4; // top + bottom
+
+    #define GROUP_DEF(grp)                  height += kPODItemHeight;
+    #define ITEM_DEF(type, var, default)    height += getItemHeight(var);
+    #define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
+    #include "item.def"
+    #undef ITEM_DEF_MINMAX
+    #undef ITEM_DEF
+    #undef GROUP_DEF
+
+        return height;
+    }
 }
 
-int getConfigUIHeight()
+shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
 {
-    int height = kPODItemHeight * 4; // top + bottom
-
-#define GROUP_DEF(grp)                  height += kPODItemHeight;
-#define ITEM_DEF(type, var, default)    height += getItemHeight(var);
-#define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
+#ifdef CINDER_COCOA_TOUCH
+    return nullptr;
+#else
+    ivec2 newsize = {size.x, max(size.y, getConfigUIHeight()) };
+    
+    auto params = params::InterfaceGl::create("MiniConfig", newsize);
+    params->addButton("SAVE", writeConfig);
+#define GROUP_DEF(grp)                  params->addSeparator(#grp);
+#define ITEM_DEF(type, var, default)    params->addParam(#var, &var);
+#define ITEM_DEF_MINMAX(type, var, default, Min, Max)               \
+do                                                              \
+{                                                               \
+type step = (Max - Min) / (type)500;                        \
+params->addParam(#var, &var).min(Min).max(Max).step(step);  \
+} while(0);
 #include "item.def"
 #undef ITEM_DEF_MINMAX
 #undef ITEM_DEF
 #undef GROUP_DEF
-
-    return height;
+    params->addSeparator();
+    
+    getWindow()->getSignalPostDraw().connect(std::bind(&params::InterfaceGl::draw, params));
+    
+    return params;
+#endif
 }
+

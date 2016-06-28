@@ -6,6 +6,9 @@
 #include "cinder/ObjLoader.h"
 #include "cinder/Log.h"
 #include "cinder/Function.h"
+#include "cinder/GeomIo.h"
+#include "cinder/gl/Shader.h"
+#include "cinder/ip/checkerboard.h"
 #include <map>
 
 using namespace std;
@@ -14,30 +17,32 @@ using namespace app;
 
 namespace
 {
-    template <typename T> 
+    template <typename T>
     T& getAssetResource(const string& relativeName, function<T(const string&, const string&)> loadFunc, const string& relativeNameB = "")
     {
         typedef map<string, T> MapType;
         static MapType sMap;
         static T nullResource;
-        auto it = sMap.find(relativeName+relativeNameB);
+        auto it = sMap.find(relativeName + relativeNameB);
         if (it != sMap.end())
         {
             return it->second;
         }
-        CI_LOG_V( "Loading: " << relativeName << " " << relativeNameB);
+        CI_LOG_V("Loading: " << relativeName << " " << relativeNameB);
 
         try
         {
-            auto aPath = getAssetPath("") / relativeName;
-            auto bPath = getAssetPath("") / relativeNameB;
-            
+            auto aPath = getAssetPath(relativeName);
+            if (aPath.empty()) aPath = relativeName;
+            auto bPath = getAssetPath(relativeNameB);
+            if (bPath.empty()) bPath = relativeNameB;
+
             auto resource = loadFunc(aPath.string(), bPath.string());
-            return sMap[relativeName+relativeNameB] = resource;
+            return sMap[relativeName + relativeNameB] = resource;
         }
         catch (Exception& e)
         {
-            CI_LOG_EXCEPTION( "getAssetResource", e);
+            CI_LOG_EXCEPTION("getAssetResource", e);
             return nullResource;
         }
     }
@@ -47,7 +52,7 @@ namespace am
 {
     SurfaceRef& surface(const string& relativeName)
     {
-        auto loader = [](const string& absoluteName, const string&) -> SurfaceRef
+        auto loader = [](const string & absoluteName, const string&) -> SurfaceRef
         {
             auto source = loadImage(absoluteName);
             return Surface::create(source);
@@ -58,14 +63,21 @@ namespace am
     template <typename T>
     shared_ptr<T>& texture(const string& relativeName, const typename T::Format& format)
     {
-        auto loader = [&format](const string& absoluteName, const string&) -> shared_ptr<T>
+        auto loader = [&format](const string & absoluteName, const string&) -> shared_ptr < T >
         {
+            if (absoluteName == "checkerboard")
+            {
+                auto source = ip::checkerboard(512, 512);
+                return T::create(source, format);
+            }
             auto ext = fs::path(absoluteName).extension();
+#if !defined( CINDER_GL_ES ) || defined( CINDER_GL_ANGLE )
             if (ext == ".dds")
             {
                 auto source = DataSourcePath::create(absoluteName);
                 return T::createFromDds(source, format);
             }
+#endif
             if (ext == ".ktx")
             {
                 auto source = DataSourcePath::create(absoluteName);
@@ -91,44 +103,37 @@ namespace am
     {
         return texture<gl::TextureCubeMap>(relativeName, format);
     }
-
-    static TriMeshRef loadTriMesh(const string& absoluteName, const string&)
-    {
-        auto source = DataSourcePath::create(absoluteName);
-        auto ext = fs::path(absoluteName).extension();
-        TriMeshRef mesh;
-        
-        if (ext == ".obj")
-        {
-            ObjLoader loader( source );
-            mesh = TriMesh::create(loader);
-        }
-        else if (ext == ".msh")
-        {
-            mesh = TriMesh::create();
-            mesh->read(source);
-        }
-        else
-        {
-            CI_LOG_W( "Unsupported mesh format: " << absoluteName );
-            return nullptr;
-        }
-        
-        if( !mesh->hasNormals() ) {
-            mesh->recalculateNormals();
-        }
-        
-        if( ! mesh->hasTangents() ) {
-            mesh->recalculateTangents();
-        }
-        
-        return mesh;
-    }
-
+    
     TriMeshRef& triMesh(const string& relativeName)
     {
-        auto loader = [](const string& absoluteName, const string&) -> TriMeshRef
+        auto loader = [](const string & absoluteName, const string&) -> TriMeshRef
         {
+#define ENTRY(name)  if (absoluteName == #name) return TriMesh::create(geom::name());
+            ENTRY(Rect);
+            ENTRY(RoundedRect);
+            ENTRY(Cube);
+            ENTRY(Icosahedron);
+            ENTRY(Icosphere);
+            ENTRY(Teapot);
+            ENTRY(Circle);
+            ENTRY(Ring);
+            ENTRY(Sphere);
+            ENTRY(Capsule);
+            ENTRY(Torus);
+            ENTRY(TorusKnot);
+            ENTRY(Cylinder);
+            ENTRY(Plane);
+            ENTRY(WireCapsule);
+            ENTRY(WireCircle);
+            ENTRY(WireRoundedRect);
+            ENTRY(WireCube);
+            ENTRY(WireCylinder);
+            ENTRY(WireCone);
+            ENTRY(WireIcosahedron);
+            ENTRY(WirePlane);
+            ENTRY(WireSphere);
+            ENTRY(WireTorus);
+#undef ENTRY
             auto source = DataSourcePath::create(absoluteName);
             auto ext = fs::path(absoluteName).extension();
             TriMeshRef mesh;
@@ -159,16 +164,15 @@ namespace am
 
             return mesh;
         };
-        return getAssetResource<TriMeshRef>(relativeName, loadTriMesh);
+        return getAssetResource<TriMeshRef>(relativeName, loader);
     }
 
     gl::VboMeshRef& vboMesh(const string& relativeName)
     {
-        auto loader = [](const string& absoluteName, const string&) -> gl::VboMeshRef
+        auto tri = triMesh(relativeName);
+        auto loader = [&tri](const string & absoluteName, const string&) -> gl::VboMeshRef
         {
-            gl::VboMesh::Layout layout;
-            auto triMesh = loadTriMesh(absoluteName, "");
-            return gl::VboMesh::create(*triMesh);
+            return gl::VboMesh::create(*tri);
         };
 
         return getAssetResource<gl::VboMeshRef>(relativeName, loader);
@@ -176,8 +180,12 @@ namespace am
 
     gl::GlslProgRef& glslProg(const string& vsFileName, const string& fsFileName)
     {
-        auto loader = [](const string& vsAbsoluteName, const string& fsAbsoluteName) -> gl::GlslProgRef
+        auto loader = [](const string & vsAbsoluteName, const string & fsAbsoluteName) -> gl::GlslProgRef
         {
+            if (vsAbsoluteName == "texture") return gl::getStockShader(gl::ShaderDef().texture());
+            if (vsAbsoluteName == "color") return gl::getStockShader(gl::ShaderDef().color());
+            if (vsAbsoluteName == "color+texture") return gl::getStockShader(gl::ShaderDef().color().texture());
+            if (vsAbsoluteName == "lambert") return gl::getStockShader(gl::ShaderDef().lambert());
             gl::GlslProg::Format format;
 #if defined( CINDER_GL_ES )
             format.version(300); // es 3.0
@@ -195,7 +203,7 @@ namespace am
 
     string& str(const string& relativeName)
     {
-        auto loader = [](const string& absoluteName, const string&) -> string
+        auto loader = [](const string & absoluteName, const string&) -> string
         {
             return loadString(DataSourcePath::create(absoluteName));
         };
@@ -208,15 +216,15 @@ namespace am
         fs::directory_iterator kEnd;
         for (fs::directory_iterator it(absoluteFolderName); it != kEnd; ++it)
         {
-            if (fs::is_regular_file(*it) && it->path().extension() != ".db" 
+            if (fs::is_regular_file(*it) && it->path().extension() != ".db"
                 && it->path().extension() != ".DS_Store")
             {
 #ifdef _DEBUG
                 //console() << it->path() << endl;
 #endif
                 files.push_back(isLongMode ?
-                                it->path().string() :
-                                it->path().filename().string());
+                    it->path().string() :
+                    it->path().filename().string());
             }
         }
         return files;
@@ -226,10 +234,10 @@ namespace am
     {
         return getAssetResource<vector<string>>(relativeFolderName, bind(loadPaths, placeholders::_1, placeholders::_2, true));
     }
-    
+
     vector<string> shortPaths(const string& relativeFolderName)
     {
         return getAssetResource<vector<string>>(relativeFolderName, bind(loadPaths, placeholders::_1, placeholders::_2, false));
     }
-    
+
 }

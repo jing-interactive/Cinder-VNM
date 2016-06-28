@@ -43,5 +43,4 @@ class InterfaceGl;
     param->removeParam(#intValue);                       \
     param->addParam(#intValue, enumNames, &intValue);
 
-void setupConfigUI(cinder::params::InterfaceGl* params);
-int getConfigUIHeight();
+std::shared_ptr<ci::params::InterfaceGl> createConfigUI(const ci::ivec2& size);
