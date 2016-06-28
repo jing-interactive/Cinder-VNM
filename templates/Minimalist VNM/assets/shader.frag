@@ -3,11 +3,11 @@ uniform sampler2D uTex1;
 uniform sampler2D uTex2;
 uniform sampler2D uTex3;
 
-in vec4     Color;
-in vec3     Normal;
-in vec2     TexCoord;
+in lowp vec4     Color;
+in highp vec3     Normal;
+in highp vec2     TexCoord;
 
-out vec4    oColor;
+out highp vec4    oColor;
 
 void main( void )
 {
