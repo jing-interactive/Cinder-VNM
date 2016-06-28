@@ -15,7 +15,7 @@ class _TBOX_PREFIX_App : public App
   public:
     void setup() override
     {
-        auto aabb = am::triMesh("Teapot")->calcBoundingBox();
+        auto aabb = am::triMesh(MESH_NAME)->calcBoundingBox();
         mCam.lookAt(aabb.getMax() * 2.0f, aabb.getCenter());
         mCamUi = CameraUi( &mCam, getWindow(), -1 );
         
@@ -30,9 +30,9 @@ class _TBOX_PREFIX_App : public App
             gl::setMatrices( mCam );
             gl::clear();
         
-            gl::ScopedTextureBind tex0(am::texture2d("checkerboard"));
-            gl::ScopedGlslProg glsl(am::glslProg("texture"));
-            gl::draw(am::vboMesh("Teapot"));
+            gl::ScopedTextureBind tex0(am::texture2d(TEX0_NAME));
+            gl::ScopedGlslProg glsl(am::glslProg(VS_NAME, FS_NAME));
+            gl::draw(am::vboMesh(MESH_NAME));
         });
     }
     
