@@ -34,7 +34,10 @@ class _TBOX_PREFIX_App : public App
             gl::setMatrices( mCam );
             gl::clear();
         
-            gl::ScopedTextureBind tex0(am::texture2d(TEX0_NAME));
+            gl::ScopedTextureBind tex0(am::texture2d(TEX0_NAME), 0);
+            gl::ScopedTextureBind tex1(am::texture2d(TEX1_NAME), 1);
+            gl::ScopedTextureBind tex2(am::texture2d(TEX2_NAME), 2);
+            gl::ScopedTextureBind tex3(am::texture2d(TEX3_NAME), 3);
             gl::ScopedGlslProg glsl(am::glslProg(VS_NAME, FS_NAME));
             gl::draw(am::vboMesh(MESH_NAME));
         });
