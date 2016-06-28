@@ -230,14 +230,24 @@ namespace am
         return files;
     }
 
-    vector<string> longPaths(const string& relativeFolderName)
+    vector<string>& longPaths(const string& relativeFolderName)
     {
         return getAssetResource<vector<string>>(relativeFolderName, bind(loadPaths, placeholders::_1, placeholders::_2, true));
     }
 
-    vector<string> shortPaths(const string& relativeFolderName)
+    vector<string>& shortPaths(const string& relativeFolderName)
     {
         return getAssetResource<vector<string>>(relativeFolderName, bind(loadPaths, placeholders::_1, placeholders::_2, false));
+    }
+
+    audio::VoiceRef voice(const string& relativeName)
+    {
+        auto loader = [](const string & absoluteName, const string&) -> audio::VoiceRef
+        {
+            auto source = audio::load(DataSourcePath::create(absoluteName));
+            return audio::Voice::create(source);
+        };
+        return getAssetResource<audio::VoiceRef>(relativeName, loader);
     }
 
 }

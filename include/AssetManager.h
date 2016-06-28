@@ -3,6 +3,8 @@
 #include "cinder/gl/Texture.h"
 #include "cinder/gl/VboMesh.h"
 #include "cinder/gl/GlslProg.h"
+#include "cinder/audio/Voice.h"
+
 #include <string>
 #include <vector>
 
@@ -27,6 +29,8 @@ namespace am // am -> asset manager
 
     std::string& str(const std::string& relativeName);
 
-    std::vector<std::string> longPaths(const std::string& relativeFolderName);
-    std::vector<std::string> shortPaths(const std::string& relativeFolderName);
+    std::vector<std::string>& longPaths(const std::string& relativeFolderName);
+    std::vector<std::string>& shortPaths(const std::string& relativeFolderName);
+
+    ci::audio::VoiceRef voice(const std::string& relativeName);
 }
