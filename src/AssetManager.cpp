@@ -45,21 +45,20 @@ namespace
 
 namespace am
 {
-    static SurfaceRef loadSurface(const string& absoluteName, const string&)
-    {
-        auto source = loadImage(absoluteName);
-        return Surface::create(source);
-    }
-
     SurfaceRef& surface(const string& relativeName)
     {
-        return getAssetResource<SurfaceRef>(relativeName, loadSurface);
+        auto loader = [](const string& absoluteName, const string&) -> SurfaceRef
+        {
+            auto source = loadImage(absoluteName);
+            return Surface::create(source);
+        };
+        return getAssetResource<SurfaceRef>(relativeName, loader);
     }
 
     template <typename T>
     shared_ptr<T>& texture(const string& relativeName, const typename T::Format& format)
     {
-        auto loadTexture = [&format](const string& absoluteName, const string&) -> shared_ptr<T>
+        auto loader = [&format](const string& absoluteName, const string&) -> shared_ptr<T>
         {
             auto ext = fs::path(absoluteName).extension();
             if (ext == ".dds")
@@ -75,7 +74,7 @@ namespace am
             auto source = loadImage(absoluteName);
             return T::create(source, format);
         };
-        return getAssetResource<shared_ptr<T>>(relativeName, loadTexture);
+        return getAssetResource<shared_ptr<T>>(relativeName, loader);
     }
 
     //gl::Texture1dRef& texture1d(const std::string& relativeName, const gl::Texture1d::Format& format)
@@ -128,48 +127,79 @@ namespace am
 
     TriMeshRef& triMesh(const string& relativeName)
     {
-        return getAssetResource<TriMeshRef>(relativeName, loadTriMesh);
-    }
+        auto loader = [](const string& absoluteName, const string&) -> TriMeshRef
+        {
+            auto source = DataSourcePath::create(absoluteName);
+            auto ext = fs::path(absoluteName).extension();
+            TriMeshRef mesh;
 
-    static gl::VboMeshRef loadVboMesh(const string& absoluteName, const string&)
-    {
-        gl::VboMesh::Layout layout;
-        auto triMesh = loadTriMesh(absoluteName, "");
-        return gl::VboMesh::create(*triMesh);
+            if (ext == ".obj")
+            {
+                ObjLoader loader(source);
+                mesh = TriMesh::create(loader);
+            }
+            else if (ext == ".msh")
+            {
+                mesh = TriMesh::create();
+                mesh->read(source);
+            }
+            else
+            {
+                CI_LOG_W("Unsupported mesh format: " << absoluteName);
+                return nullptr;
+            }
+
+            if (!mesh->hasNormals()) {
+                mesh->recalculateNormals();
+            }
+
+            if (!mesh->hasTangents()) {
+                mesh->recalculateTangents();
+            }
+
+            return mesh;
+        };
+        return getAssetResource<TriMeshRef>(relativeName, loadTriMesh);
     }
 
     gl::VboMeshRef& vboMesh(const string& relativeName)
     {
-        return getAssetResource<gl::VboMeshRef>(relativeName, loadVboMesh);
-    }
+        auto loader = [](const string& absoluteName, const string&) -> gl::VboMeshRef
+        {
+            gl::VboMesh::Layout layout;
+            auto triMesh = loadTriMesh(absoluteName, "");
+            return gl::VboMesh::create(*triMesh);
+        };
 
-    static gl::GlslProgRef loadGlslProg(const string& vsAbsoluteName, const string& fsAbsoluteName)
-    {
-        gl::GlslProg::Format format;
-#if defined( CINDER_GL_ES )
-        format.version(300); // es 3.0
-#else
-        format.version(150); // gl 3.2
-#endif
-        format.vertex(DataSourcePath::create(vsAbsoluteName));
-        format.fragment(DataSourcePath::create(fsAbsoluteName));
-                
-        return gl::GlslProg::create(format);
+        return getAssetResource<gl::VboMeshRef>(relativeName, loader);
     }
 
     gl::GlslProgRef& glslProg(const string& vsFileName, const string& fsFileName)
     {
-        return getAssetResource<gl::GlslProgRef>(vsFileName, loadGlslProg, fsFileName);
-    }
+        auto loader = [](const string& vsAbsoluteName, const string& fsAbsoluteName) -> gl::GlslProgRef
+        {
+            gl::GlslProg::Format format;
+#if defined( CINDER_GL_ES )
+            format.version(300); // es 3.0
+#else
+            format.version(150); // gl 3.2
+#endif
+            format.vertex(DataSourcePath::create(vsAbsoluteName));
+            format.fragment(DataSourcePath::create(fsAbsoluteName));
 
-    static string loadStr(const string& absoluteName, const string&)
-    {
-        return loadString(DataSourcePath::create(absoluteName));
+            return gl::GlslProg::create(format);
+        };
+
+        return getAssetResource<gl::GlslProgRef>(vsFileName, loader, fsFileName);
     }
 
     string& str(const string& relativeName)
     {
-        return getAssetResource<string>(relativeName, loadStr);
+        auto loader = [](const string& absoluteName, const string&) -> string
+        {
+            return loadString(DataSourcePath::create(absoluteName));
+        };
+        return getAssetResource<string>(relativeName, loader);
     }
 
     static vector<string> loadPaths(const string& absoluteFolderName, const string&, bool isLongMode)
