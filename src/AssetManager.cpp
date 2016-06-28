@@ -186,6 +186,9 @@ namespace am
             if (vsAbsoluteName == "color") return gl::getStockShader(gl::ShaderDef().color());
             if (vsAbsoluteName == "color+texture") return gl::getStockShader(gl::ShaderDef().color().texture());
             if (vsAbsoluteName == "lambert") return gl::getStockShader(gl::ShaderDef().lambert());
+            if (vsAbsoluteName == "lambert+texture") return gl::getStockShader(gl::ShaderDef().lambert().texture());
+            if (vsAbsoluteName == "lambert+color+texture") return gl::getStockShader(gl::ShaderDef().lambert().color().texture());
+            
             gl::GlslProg::Format format;
 #if defined( CINDER_GL_ES )
             format.version(300); // es 3.0
