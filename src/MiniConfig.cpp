@@ -1,8 +1,12 @@
-﻿#include "../include/MiniConfig.h"
+#include "../include/MiniConfig.h"
 #include <cinder/xml.h>
 #include <cinder/Utilities.h>
 #include <cinder/app/App.h>
 #include <cinder/params/Params.h>
+
+#ifndef CINDER_COCOA_TOUCH
+#include <cinder/ImageIo.h>
+#endif
 
 using namespace ci;
 using namespace ci::app;
@@ -159,6 +163,17 @@ namespace
     }
 }
 
+void takeScreenShot()
+{
+    auto windowSurf = copyWindowSurface();
+#ifdef CINDER_COCOA_TOUCH
+    cocoa::writeToSavedPhotosAlbum(windowSurf);
+#else
+    fs::path writePath = getAppPath() / ("screenshot_" + toString(getElapsedFrames()) + ".png");
+    writeImage(writePath, windowSurf);
+#endif
+}
+
 shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
 {
 #ifdef CINDER_COCOA_TOUCH
@@ -168,6 +183,14 @@ shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
     
     auto params = params::InterfaceGl::create("MiniConfig", newsize);
     params->addButton("SAVE", writeConfig);
+    params->addButton("SCREENSHOT", takeScreenShot);
+    auto windowSurf = copyWindowSurface();
+#ifdef CINDER_COCOA_TOUCH
+    cocoa::writeToSavedPhotosAlbum(windowSurf);
+#else
+    fs::path writePath = getAppPath() / ("screenshot_" + toString(getElapsedFrames()) + ".png");
+    writeImage(writePath, windowSurf);
+#endif
 #define GROUP_DEF(grp)                  params->addSeparator(#grp);
 #define ITEM_DEF(type, var, default)    params->addParam(#var, &var);
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max)               \
