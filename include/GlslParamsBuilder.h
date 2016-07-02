@@ -10,15 +10,16 @@ struct GlslParamsBuilder
     GlslParamsBuilder() {}
     
     template <typename T>
-    void addParam(ci::gl::GlslProgRef glsl, ci::params::InterfaceGlRef params, std::string name, T& value)
+    ci::params::InterfaceGl::Options<T> addParam(ci::gl::GlslProgRef glsl, ci::params::InterfaceGlRef params, std::string name, T& value)
     {
-        params->addParam(name, &value).updateFn([glsl, name, &value]{
+        return params->addParam(name, &value).updateFn([glsl, name, &value]{
             glsl->uniform(name, value);
         });
     }
     
     GlslParamsBuilder(ci::gl::GlslProgRef glsl, ci::params::InterfaceGlRef params)
     {
+        glslProg = glsl;
         //
         // glsl reflection: uniform
         //
@@ -40,12 +41,12 @@ struct GlslParamsBuilder
                 }
                 case GL_FLOAT:
                 {
-                    addParam(glsl, params, name, namedFloats[name]);
+                    addParam(glsl, params, name, namedFloats[name]).step(0.1f);
                     break;
                 }
                 case GL_FLOAT_VEC3:
                 {
-                    addParam(glsl, params, name, namedVec3s[name]);
+                    addParam(glsl, params, name, namedColors[name]); // namedColors or namedVec3s?
                     break;
                 }
                 case GL_BOOL:
@@ -60,14 +61,26 @@ struct GlslParamsBuilder
                 }
             }
         }
-   
+        
     }
-private:
+    
+    void applyUniforms()
+    {
+        for (auto& kv : namedInts) glslProg->uniform(kv.first, kv.second);
+        for (auto& kv : namedBools) glslProg->uniform(kv.first, kv.second);
+        for (auto& kv : namedFloats) glslProg->uniform(kv.first, kv.second);
+        for (auto& kv : namedVec3s) glslProg->uniform(kv.first, kv.second);
+        for (auto& kv : namedColors) glslProg->uniform(kv.first, kv.second);
+        for (auto& kv : namedColorAs) glslProg->uniform(kv.first, kv.second);
+    }
+    
+    ci::gl::GlslProgRef glslProg;
     
     std::unordered_map<std::string, int> namedInts;
     std::unordered_map<std::string, bool> namedBools;
     std::unordered_map<std::string, float> namedFloats;
     std::unordered_map<std::string, ci::vec3> namedVec3s;
-
+    std::unordered_map<std::string, ci::Color> namedColors;
+    std::unordered_map<std::string, ci::ColorA> namedColorAs;
 };
 
