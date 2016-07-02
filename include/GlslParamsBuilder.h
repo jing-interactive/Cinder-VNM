@@ -10,15 +10,21 @@ struct GlslParamsBuilder
     GlslParamsBuilder() {}
     
     template <typename T>
-    ci::params::InterfaceGl::Options<T> addParam(ci::gl::GlslProgRef glsl, ci::params::InterfaceGlRef params, std::string name, T& value)
+    ci::params::InterfaceGl::Options<T> addParam(ci::gl::GlslProgRef glsl, ci::params::InterfaceGlRef params,
+                                                 std::string guiName, std::string name, std::unordered_map<std::string, T>& container)
     {
-        return params->addParam(name, &value).updateFn([glsl, name, &value]{
+        auto& value = container[name];
+        return params->addParam(guiName, &value).updateFn([glsl, name, &value]{
             glsl->uniform(name, value);
         });
     }
     
     GlslParamsBuilder(ci::gl::GlslProgRef glsl, ci::params::InterfaceGlRef params)
     {
+        params->addSeparator();
+        auto label = glsl->getLabel();
+        params->addText(label);
+        
         glslProg = glsl;
         //
         // glsl reflection: uniform
@@ -29,6 +35,7 @@ struct GlslParamsBuilder
             if (uniform.getCount() != 1) continue; // skip array
             if (uniform.getUniformSemantic() != ci::gl::UNIFORM_USER_DEFINED) continue; // skip cinder-defined semantic
             auto name = uniform.getName();
+            auto guiName = label + "::" + name;
             
             switch (uniform.getType())
             {
@@ -36,27 +43,27 @@ struct GlslParamsBuilder
                 case GL_SAMPLER_2D:
                 case GL_SAMPLER_CUBE:
                 {
-                    addParam(glsl, params, name, namedInts[name]);
+                    addParam(glsl, params, guiName, name, namedInts);
                     break;
                 }
                 case GL_FLOAT:
                 {
-                    addParam(glsl, params, name, namedFloats[name]).step(0.1f);
+                    addParam(glsl, params, guiName, name, namedFloats).step(0.1f);
                     break;
                 }
                 case GL_FLOAT_VEC3:
                 {
-                    addParam(glsl, params, name, namedColors[name]); // namedColors or namedVec3s?
+                    addParam(glsl, params, guiName, name, namedColors); // namedColors or namedVec3s?
                     break;
                 }
                 case GL_BOOL:
                 {
-                    addParam(glsl, params, name, namedBools[name]);
+                    addParam(glsl, params, guiName, name, namedBools);
                     break;
                 }
                 default:
                 {
-                    params->addText(name);
+                    params->addText(guiName);
                     break;
                 }
             }
