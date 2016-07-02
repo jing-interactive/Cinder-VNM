@@ -30,6 +30,9 @@ struct GlslParamsBuilder
         // glsl reflection: uniform
         //
         auto activeUniforms = glsl->getActiveUniforms();
+        sort(activeUniforms.begin(), activeUniforms.end(), [](const ci::gl::GlslProg::Uniform & a, const ci::gl::GlslProg::Uniform & b) -> bool{
+            return a.getName() < b.getName();
+        });
         for (auto uniform : activeUniforms)
         {
             if (uniform.getCount() != 1) continue; // skip array
