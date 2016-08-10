@@ -6,10 +6,6 @@
 #include <cinder/Utilities.h>
 #include <cinder/app/App.h>
 
-#ifndef CINDER_COCOA_TOUCH
-#include <cinder/ImageIo.h>
-#endif
-
 using namespace ci;
 using namespace ci::app;
 using namespace std;
@@ -70,13 +66,7 @@ namespace
 
         if (ui::Button("Save Image"))
         {
-            auto windowSurf = copyWindowSurface();
-#ifdef CINDER_COCOA_TOUCH
-            cocoa::writeToSavedPhotosAlbum(windowSurf);
-#else
-            fs::path writePath = getAppPath() / ("screenshot_" + toString(getElapsedFrames()) + ".png");
-            writeImage(writePath, windowSurf);
-#endif
+            takeScreenShot();
         }
 #define GROUP_DEF(grp)                     ui::Separator();
 #define ITEM_DEF(type, var, default)        addImguiParam(#var, var);

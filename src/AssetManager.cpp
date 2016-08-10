@@ -63,28 +63,30 @@ namespace am
     template <typename T>
     shared_ptr<T>& texture(const string& relativeName, const typename T::Format& format)
     {
-        auto loader = [&format](const string & absoluteName, const string&) -> shared_ptr < T >
+        auto _format = format;
+        _format.setLabel(relativeName);
+        auto loader = [=](const string & absoluteName, const string&) -> shared_ptr < T >
         {
             if (absoluteName == "checkerboard")
             {
                 auto source = ip::checkerboard(512, 512);
-                return T::create(source, format);
+                return T::create(source, _format);
             }
             auto ext = fs::path(absoluteName).extension();
 #if !defined( CINDER_GL_ES ) || defined( CINDER_GL_ANGLE )
             if (ext == ".dds")
             {
                 auto source = DataSourcePath::create(absoluteName);
-                return T::createFromDds(source, format);
+                return T::createFromDds(source, _format);
             }
 #endif
             if (ext == ".ktx")
             {
                 auto source = DataSourcePath::create(absoluteName);
-                return T::createFromKtx(source, format);
+                return T::createFromKtx(source, _format);
             }
             auto source = loadImage(absoluteName);
-            return T::create(source, format);
+            return T::create(source, _format);
         };
         return getAssetResource<shared_ptr<T>>(relativeName, loader);
     }
@@ -180,7 +182,8 @@ namespace am
 
     gl::GlslProgRef& glslProg(const string& vsFileName, const string& fsFileName)
     {
-        auto loader = [](const string & vsAbsoluteName, const string & fsAbsoluteName) -> gl::GlslProgRef
+        auto label = vsFileName + "/" + fsFileName;
+        auto loader = [=](const string & vsAbsoluteName, const string & fsAbsoluteName) -> gl::GlslProgRef
         {
             if (vsAbsoluteName == "texture") return gl::getStockShader(gl::ShaderDef().texture());
             if (vsAbsoluteName == "color") return gl::getStockShader(gl::ShaderDef().color());
@@ -197,6 +200,7 @@ namespace am
 #endif
             format.vertex(DataSourcePath::create(vsAbsoluteName));
             format.fragment(DataSourcePath::create(fsAbsoluteName));
+            format.setLabel(label);
 
             return gl::GlslProg::create(format);
         };

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <string>
 #include "cinder/Vector.h"
@@ -34,6 +34,7 @@ ITEM_DEF_MINMAX(float, delay, 3.0f, 0.0f, 10.0f)
 void readConfig();
 void writeConfig();
 void revertToDefaultValues();
+void takeScreenShot(); // wait! why is it here?
 
 namespace cinder { namespace params {
 class InterfaceGl;
@@ -44,3 +45,4 @@ class InterfaceGl;
     param->addParam(#intValue, enumNames, &intValue);
 
 std::shared_ptr<ci::params::InterfaceGl> createConfigUI(const ci::ivec2& size);
+
