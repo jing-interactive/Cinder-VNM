@@ -6,9 +6,7 @@
 #include <unordered_map>
 
 struct GlslParamsBuilder
-{
-    GlslParamsBuilder() {}
-    
+{    
     template <typename T>
     ci::params::InterfaceGl::Options<T> addParam(ci::gl::GlslProgRef glsl, ci::params::InterfaceGlRef params,
                                                  std::string guiName, std::string name, std::unordered_map<std::string, T>& container)

@@ -1,6 +1,6 @@
-﻿#pragma once
+#pragma once
 
-#include "../include/MiniConfig.h"
+#include "MiniConfig.h"
 #include "Cinder-ImGui/include/CinderImGui.h"
 
 #include <cinder/Utilities.h>
@@ -83,7 +83,7 @@ namespace
     }
 }
 
-void setupConfigImgui()
+void createConfigImgui()
 {
     getWindow()->getSignalDraw().connect(drawImgui);
 }
