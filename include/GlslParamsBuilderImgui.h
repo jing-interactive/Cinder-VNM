@@ -1,23 +1,13 @@
 #pragma once
 
 #include "cinder/gl/GlslProg.h"
-#include "Cinder-ImGui/include/CinderImGui.h"
+#include "MiniConfigImgui.h"
 
 #include <unordered_map>
 
 struct GlslParamsBuilderImgui
 {
     GlslParamsBuilderImgui() {}
-    
-    //    template <typename T>
-    //    ci::params::InterfaceGl::Options<T> addParam(ci::gl::GlslProgRef glsl,
-    //                                                 std::string guiName, std::string name, std::unordered_map<std::string, T>& container)
-    //    {
-    //        auto& value = container[name];
-    //        return params->addParam(guiName, &value).updateFn([glsl, name, &value]{
-    //            glsl->uniform(name, value);
-    //        });
-    //    }
     
     GlslParamsBuilderImgui(ci::gl::GlslProgRef glsl)
     {
@@ -32,7 +22,7 @@ struct GlslParamsBuilderImgui
         });
         
         
-//        App::get()->getSignalUpdate().connect(std::bind(&GlslParamsBuilderImgui::drawImgui, this));
+        App::get()->getSignalUpdate().connect(std::bind(&GlslParamsBuilderImgui::drawImgui, this));
     }
     
     void applyUniforms()
@@ -56,51 +46,66 @@ struct GlslParamsBuilderImgui
     std::unordered_map<std::string, ci::ColorA> namedColorAs;
     
 private:
+    
+    template <typename T>
+    void addParam(ci::gl::GlslProgRef glsl,
+                  std::string guiName, std::string name, std::unordered_map<std::string, T>& container)
+    {
+        auto& value = container[name];
+        if (vnm::addImguiParam(guiName.c_str(), value))
+        {
+            glsl->uniform(name, value);
+        };
+    }
+    
     void drawImgui()
     {
+        ui::ScopedWindow window("Config");
+        
         auto label = glslProg->getLabel();
-        if (ui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+        if (!ui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+            return;
+        
+        for (auto uniform : activeUniforms)
         {
-            for (auto uniform : activeUniforms)
+            if (uniform.getCount() != 1) continue; // skip array
+            if (uniform.getUniformSemantic() != ci::gl::UNIFORM_USER_DEFINED) continue; // skip cinder-defined semantic
+            auto name = uniform.getName();
+            auto guiName = label + "::" + name;
+            
+            switch (uniform.getType())
             {
-                //            if (uniform.getCount() != 1) continue; // skip array
-                //            if (uniform.getUniformSemantic() != ci::gl::UNIFORM_USER_DEFINED) continue; // skip cinder-defined semantic
-                //            auto name = uniform.getName();
-                //            auto guiName = label + "::" + name;
-                //
-                //            switch (uniform.getType())
-                //            {
-                //                case GL_INT:
-                //                case GL_SAMPLER_2D:
-                //                case GL_SAMPLER_CUBE:
-                //                {
-                //                    addParam(glsl, params, guiName, name, namedInts);
-                //                    break;
-                //                }
-                //                case GL_FLOAT:
-                //                {
-                //                    addParam(glsl, params, guiName, name, namedFloats).step(0.1f);
-                //                    break;
-                //                }
-                //                case GL_FLOAT_VEC3:
-                //                {
-                //                    addParam(glsl, params, guiName, name, namedColors); // namedColors or namedVec3s?
-                //                    break;
-                //                }
-                //                case GL_BOOL:
-                //                {
-                //                    addParam(glsl, params, guiName, name, namedBools);
-                //                    break;
-                //                }
-                //                default:
-                //                {
-                //                    params->addText(guiName);
-                //                    break;
-                //                }
-                //            }
+                case GL_INT:
+                case GL_SAMPLER_2D:
+                case GL_SAMPLER_CUBE:
+                {
+                    addParam(glslProg, guiName, name, namedInts);
+                    break;
+                }
+                case GL_FLOAT:
+                {
+                    addParam(glslProg, guiName, name, namedFloats);
+                    break;
+                }
+                case GL_FLOAT_VEC3:
+                {
+                    addParam(glslProg, guiName, name, namedColors); // namedColors or namedVec3s?
+                    break;
+                }
+                case GL_BOOL:
+                {
+                    addParam(glslProg, guiName, name, namedBools);
+                    break;
+                }
+                default:
+                {
+                    ui::Text("%s", guiName.c_str());
+                    break;
+                }
             }
         }
+        
     };
-
+    
 };
 

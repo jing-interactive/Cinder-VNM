@@ -10,51 +10,51 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-namespace
+namespace vnm
 {
-    void addImguiParam(const char* label, int& v)
+    bool addImguiParam(const char* label, int& v)
     {
-        ui::DragInt(label, &v);
+        return ui::DragInt(label, &v);
     }
 
-    void addImguiParam(const char* label, float& v)
+    bool addImguiParam(const char* label, float& v)
     {
-        ui::SliderFloat(label, &v, 0.0f, 1.0f);
+        return ui::SliderFloat(label, &v, 0.0f, 1.0f);
     }
 
-    void addImguiParam(const char* label, float& v, float min, float max)
+    bool addImguiParam(const char* label, float& v, float min, float max)
     {
-        ui::SliderFloat(label, &v, min, max);
+        return ui::SliderFloat(label, &v, min, max);
     }
 
-    void addImguiParam(const char* label, bool& v)
+    bool addImguiParam(const char* label, bool& v)
     {
-        ui::Checkbox(label, &v);
+        return ui::Checkbox(label, &v);
     }
 
-    void addImguiParam(const char* label, string& v)
+    bool addImguiParam(const char* label, string& v)
     {
-        ui::InputText(label, &v);
+        return ui::InputText(label, &v);
     }
 
-    void addImguiParam(const char* label, quat& v)
+    bool addImguiParam(const char* label, quat& v)
     {
-        ui::InputFloat4(label, &v.x);
+        return ui::InputFloat4(label, &v.x);
     }
 
-    void addImguiParam(const char* label, vec3& v)
+    bool addImguiParam(const char* label, vec3& v)
     {
-        ui::InputFloat3(label, &v.x);
+        return ui::InputFloat3(label, &v.x);
     }
 
-    void addImguiParam(const char* label, Color& v)
+    bool addImguiParam(const char* label, Color& v)
     {
-        ui::ColorEdit3(label, &v.r);
+        return ui::ColorEdit3(label, &v.r);
     }
 
-    void addImguiParam(const char* label, ColorA& v)
+    bool addImguiParam(const char* label, ColorA& v)
     {
-        ui::ColorEdit4(label, &v.r, true);
+        return ui::ColorEdit4(label, &v.r, true);
     }
 
     void drawImgui()
@@ -96,5 +96,5 @@ namespace
 void createConfigImgui()
 {
     ui::initialize();
-    App::get()->getSignalUpdate().connect(drawImgui);
+    App::get()->getSignalUpdate().connect(vnm::drawImgui);
 }
