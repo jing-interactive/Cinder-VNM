@@ -59,27 +59,39 @@ namespace
 
     void drawImgui()
     {
+        ui::ScopedWindow window("Config");
         if (ui::Button("Save Config"))
         {
             writeConfig();
         }
 
-        if (ui::Button("Save Image"))
+        if (ui::Button("Take Screenshot"))
         {
             takeScreenShot();
         }
-#define GROUP_DEF(grp)                     ui::Separator();
+        
+#define GROUP_DEF(grp)                      } if (ui::CollapsingHeader(#grp)) {
 #define ITEM_DEF(type, var, default)        addImguiParam(#var, var);
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max)  addImguiParam(#var, var, Min, Max);
+        if (true) {
 #include "item.def"
+        }
 #undef ITEM_DEF_MINMAX
 #undef ITEM_DEF
 #undef GROUP_DEF
 
+        ui::Separator();
+        
         if (ui::Button("Quit"))
         {
             App::get()->quit();
         }
+        
+        static bool isTestWindowOpened = false;
+        if (ui::Button("ShowTestWindow"))
+            isTestWindowOpened = !isTestWindowOpened;
+        if (isTestWindowOpened)
+            ui::ShowTestWindow(&isTestWindowOpened);
     }
 }
 
