@@ -192,7 +192,7 @@ shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
     writeImage(writePath, windowSurf);
 #endif
 #define GROUP_DEF(grp)                  params->addSeparator(#grp);
-#define ITEM_DEF(type, var, default)    params->addParam(#var, &var);
+#define ITEM_DEF(type, var, default)    params->addParam(#var, &var, #var[0] == '_');
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max)               \
 do                                                              \
 {                                                               \
