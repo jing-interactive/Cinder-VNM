@@ -11,6 +11,8 @@
 namespace am // am -> asset manager
 {
     ci::SurfaceRef& surface(const std::string& relativeName);
+    ci::ChannelRef& channel(const std::string& relativeName);
+    ci::Channel16uRef& channel16u(const std::string& relativeName);
 
     // Supports jpg, png, bmp, tga, dds, ktx etc.
     // Special support: "checkerboard"

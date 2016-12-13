@@ -60,6 +60,26 @@ namespace am
         return getAssetResource<SurfaceRef>(relativeName, loader);
     }
 
+    ChannelRef& channel(const std::string& relativeName)
+    {
+        auto loader = [](const string & absoluteName, const string&) -> ChannelRef
+        {
+            auto source = loadImage(absoluteName);
+            return Channel::create(source);
+        };
+        return getAssetResource<ChannelRef>(relativeName, loader);
+    }
+
+    Channel16uRef& channel16u(const std::string& relativeName)
+    {
+        auto loader = [](const string & absoluteName, const string&) -> Channel16uRef
+        {
+            auto source = loadImage(absoluteName);
+            return Channel16u::create(source);
+        };
+        return getAssetResource<Channel16uRef>(relativeName, loader);
+    }
+
     template <typename T>
     shared_ptr<T>& texture(const string& relativeName, const typename T::Format& format)
     {
