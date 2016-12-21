@@ -65,7 +65,7 @@ namespace vnm
             writeConfig();
         }
 
-        if (ui::Button("Take Screenshot"))
+        if (ui::Button("Screen-shot"))
         {
             takeScreenShot();
         }
@@ -74,12 +74,13 @@ namespace vnm
             App::get()->quit();
         }
         
+#ifdef _DEBUG
         static bool isTestWindowOpened = false;
         if (ui::Button("ShowTestWindow"))
             isTestWindowOpened = !isTestWindowOpened;
         if (isTestWindowOpened)
             ui::ShowTestWindow(&isTestWindowOpened);
-        
+#endif  
         
 #define GROUP_DEF(grp)                      } if (ui::CollapsingHeader(#grp, ImGuiTreeNodeFlags_DefaultOpen)) {
 #define ITEM_DEF(type, var, default)        addImguiParam(#var, var);
