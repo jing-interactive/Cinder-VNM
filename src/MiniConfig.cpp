@@ -27,7 +27,7 @@ namespace
 
 void readConfig()
 {
-    fs::path configPath = getAssetPath("./") / kConfigFileName;
+    fs::path configPath = getAssetPath("") / kConfigFileName;
     try
     {
         XmlTree tree(loadFile(configPath));
@@ -60,7 +60,7 @@ void readConfig()
 
 void writeConfig()
 {
-    fs::path configPath = getAssetPath("./") / kConfigFileName;
+    fs::path configPath = getAssetPath("") / kConfigFileName;
     try
     {
         XmlTree tree = XmlTree::createDoc();
