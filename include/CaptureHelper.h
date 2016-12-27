@@ -1,8 +1,10 @@
 #pragma once
 
+#include "cinder/app/App.h"
 #include "cinder/Capture.h"
 #include "cinder/Log.h"
 #include "cinder/ip/flip.h"
+#include "cinder/gl/Texture.h"
 
 using namespace ci;
 using namespace ci::app;
