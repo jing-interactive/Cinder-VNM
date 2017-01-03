@@ -20,3 +20,9 @@ void updateTexture(gl::TextureRef &tex, const T &src, const gl::Texture2d::Forma
         tex->update(src);
     }
 }
+
+static gl::Texture::Format getTextureFormatUINT16()
+{
+    return gl::Texture::Format().dataType(GL_UNSIGNED_SHORT).internalFormat(GL_R16UI).immutableStorage();
+}
+

@@ -14,7 +14,7 @@ namespace am // am -> asset manager
     ci::ChannelRef& channel(const std::string& relativeName);
     ci::Channel16uRef& channel16u(const std::string& relativeName);
 
-    // Supports jpg, png, bmp, tga, dds, ktx etc.
+    // Supports jpg, png, bmp, tga, dds, ktx, hdr etc.
     // Special support: "checkerboard"
     //ci::gl::Texture1dRef& texture1d(const std::string& relativeName, const ci::gl::Texture1d::Format& format = ci::gl::Texture1d::Format());
     ci::gl::Texture2dRef& texture2d(const std::string& relativeName,
