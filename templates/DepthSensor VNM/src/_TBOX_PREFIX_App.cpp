@@ -20,10 +20,10 @@ class _TBOX_PREFIX_App : public App
         const auto& args = getCommandLineArgs();
         log::makeLogger<log::LoggerFile>();
 
-        Kinect::DeviceType type = (Kinect::DeviceType)SENSOR_TYPE;
-        Kinect::Device::Option option;
+        ds::DeviceType type = (ds::DeviceType)SENSOR_TYPE;
+        ds::Option option;
         option.enableColor = true;
-        mDevice = Kinect::Device::create(type, option);
+        mDevice = ds::Device::create(type, option);
         if (!mDevice->isValid())
         {
             quit();
@@ -31,7 +31,7 @@ class _TBOX_PREFIX_App : public App
         }
 
         mDevice->signalDepthDirty.connect([&]{
-            //
+            mDepthChannel = mDevice->depthChannel.clone();
         });
 
         mCamUi = CameraUi( &mCam, getWindow(), -1 );
@@ -59,8 +59,9 @@ class _TBOX_PREFIX_App : public App
 private:
     CameraPersp         mCam;
     CameraUi            mCamUi;
+    Channel16u          mDepthChannel;
     gl::GlslProgRef     mGlslProg;
-    Kinect::DeviceRef   mDevice;
+    ds::DeviceRef       mDevice;
 };
 
 CINDER_APP( _TBOX_PREFIX_App, RendererGl, [](App::Settings* settings) {
