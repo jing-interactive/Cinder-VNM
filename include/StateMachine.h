@@ -1,83 +1,96 @@
 #pragma once
 
-/* usage
+#if 0
+struct AwesomeApp;
 
-struct CiApp;
-
-struct StateIdle : public State<CiApp>
+struct StateIdle : public State<AwesomeApp>
 {
     GET_SINGLETON_IMPL(StateIdle);
 
-    void enter(CiApp* app);
-    void update(CiApp* host);
-    void draw(CiApp* host);
+    void enter(AwesomeApp* app){}
+    void update(AwesomeApp* app){}
+    void draw(AwesomeApp* app){}
+    void exit(AwesomeApp* app){}
 };
 
-struct StatePlay : public State<CiApp>
+struct StatePlay : public State<AwesomeApp>
 {
     GET_SINGLETON_IMPL(StatePlay);
 
-    void enter(CiApp* app);
-    void update(CiApp* host);
-    void draw(CiApp* host);
+    void enter(AwesomeApp* app){}
+    void update(AwesomeApp* app){}
+    void draw(AwesomeApp* app){}
+    void exit(AwesomeApp* app){}
 };
 
-struct CiApp : public AppBasic, StateMachine<CiApp>
+struct AwesomeApp : public App,StateMachine<AwesomeApp>
 {
-    CiApp() : StateMachine<CiApp>(this)
+    AwesomeApp(): StateMachine<AwesomeApp>(this)
     {
+        getSignalUpdate().connect([&] {
+            updateFSM();
+        });
 
+        getWindow()->getSignalDraw().connect([&] {
+            drawFSM();
+        });
     }
 }
-*/
+#endif
 
-template <typename ObjT>
+template <typename T>
 struct State
 {
-    typedef std::shared_ptr<State<ObjT>> Ref;
+    typedef std::shared_ptr<State<T>> Ref;
 
-    virtual void enter(ObjT* host)    {};
-    virtual void update(ObjT* host)   {};
-    virtual void draw(ObjT* host)     {};
-    virtual void exit(ObjT* host)     {};
+    virtual void enter(T* owner)    {};
+    virtual void update(T* owner)   {};
+    virtual void draw(T* owner)     {};
+    virtual void exit(T* owner)     {};
+    virtual void sendMessage(T* owner, const std::string& msg) {};
 };
 
 #define GET_SINGLETON_IMPL(classname) \
-    static Ref getSingleton()\
+    static Ref get()\
 {\
     static Ref sInstance = Ref(new classname);\
     return sInstance;\
 }
 
-template <typename ObjT>
+template <typename T>
 struct StateMachine
 {
-    typedef typename State<ObjT>::Ref StateRef;
+    typedef typename State<T>::Ref StateRef;
     StateRef mCurrentState;
     StateRef mPrevState;
+    T* mOwner;
 
-    ObjT*   mHost;
-
-    StateMachine(ObjT *host)
+    StateMachine(T* owner)
     {
-        mHost = host;
-    }
+        mOwner = owner;
+    };
 
-    void updateSM()
-    {
-        if (mCurrentState)
-            mCurrentState->update(mHost);
-    }
-
-    void drawSM()
+    void updateFSM()
     {
         if (mCurrentState)
-            mCurrentState->draw(mHost);
+            mCurrentState->update(mOwner);
+    }
+
+    void drawFSM()
+    {
+        if (mCurrentState)
+            mCurrentState->draw(mOwner);
+    }
+
+    void sendMessage(const std::string& msg)
+    {
+        if (mCurrentState)
+            mCurrentState->sendMessage(mOwner, msg);
     }
 
     void changeToPreviousState()
     {
-        changeToState(mHost, mPrevState);
+        changeToState(mOwner, mPrevState);
     }
 
     void changeToState(const StateRef& newState)
@@ -88,9 +101,9 @@ struct StateMachine
         if (mCurrentState)
         {
             mPrevState = mCurrentState;
-            mCurrentState->exit(mHost);
+            mCurrentState->exit(mOwner);
         }
         mCurrentState = newState;
-        mCurrentState->enter(mHost);
+        mCurrentState->enter(mOwner);
     }
 };
