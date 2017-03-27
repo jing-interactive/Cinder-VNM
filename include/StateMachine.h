@@ -7,26 +7,30 @@ struct StateIdle : public State<AwesomeApp>
 {
     GET_SINGLETON_IMPL(StateIdle);
 
-    void enter(AwesomeApp* app){}
-    void update(AwesomeApp* app){}
-    void draw(AwesomeApp* app){}
-    void exit(AwesomeApp* app){}
+    //void enter(AwesomeApp* app);
+    //void update(AwesomeApp* app);
+    //void draw(AwesomeApp* app);
+    //void exit(AwesomeApp* app);
+    //void sendMessage(AwesomeApp* app, const std::string& msg);
 };
 
 struct StatePlay : public State<AwesomeApp>
 {
     GET_SINGLETON_IMPL(StatePlay);
 
-    void enter(AwesomeApp* app){}
-    void update(AwesomeApp* app){}
-    void draw(AwesomeApp* app){}
-    void exit(AwesomeApp* app){}
+    //void enter(AwesomeApp* app);
+    //void update(AwesomeApp* app);
+    //void draw(AwesomeApp* app);
+    //void exit(AwesomeApp* app);
+    //void sendMessage(AwesomeApp* app, const std::string& msg);
 };
 
 struct AwesomeApp : public App,StateMachine<AwesomeApp>
 {
-    AwesomeApp(): StateMachine<AwesomeApp>(this)
+    AwesomeApp()
     {
+        setOwner(this);
+
         getSignalUpdate().connect([&] {
             updateFSM();
         });
@@ -63,9 +67,9 @@ struct StateMachine
     typedef typename State<T>::Ref StateRef;
     StateRef mCurrentState;
     StateRef mPrevState;
-    T* mOwner;
+    T* mOwner = nullptr;
 
-    StateMachine(T* owner)
+    void setOwner(T* owner)
     {
         mOwner = owner;
     };
@@ -90,7 +94,7 @@ struct StateMachine
 
     void changeToPreviousState()
     {
-        changeToState(mOwner, mPrevState);
+        changeToState(mPrevState);
     }
 
     void changeToState(const StateRef& newState)
