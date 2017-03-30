@@ -184,13 +184,7 @@ shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
     auto params = params::InterfaceGl::create("MiniConfig", newsize);
     params->addButton("SAVE", writeConfig);
     params->addButton("SCREENSHOT", takeScreenShot);
-    auto windowSurf = copyWindowSurface();
-#ifdef CINDER_COCOA_TOUCH
-    cocoa::writeToSavedPhotosAlbum(windowSurf);
-#else
-    fs::path writePath = getAppPath() / ("screenshot_" + toString(getElapsedFrames()) + ".png");
-    writeImage(writePath, windowSurf);
-#endif
+    params->addButton("QUIT", []{App::get()->quit(); });
 #define GROUP_DEF(grp)                  params->addSeparator(#grp);
 #define ITEM_DEF(type, var, default)    params->addParam(#var, &var, #var[0] == '_');
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max)               \
