@@ -2,6 +2,7 @@
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include "cinder/CameraUi.h"
+#include "cinder/Log.h"
 
 #include "AssetManager.h"
 #include "MiniConfig.h"
@@ -15,6 +16,8 @@ class _TBOX_PREFIX_App : public App
   public:
     void setup() override
     {
+        log::makeLogger<log::LoggerFile>();
+        
         auto aabb = am::triMesh(MESH_NAME)->calcBoundingBox();
         mCam.lookAt(aabb.getMax() * 2.0f, aabb.getCenter());
         mCamUi = CameraUi( &mCam, getWindow(), -1 );

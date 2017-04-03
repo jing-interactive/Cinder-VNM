@@ -2,7 +2,7 @@
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include "cinder/CameraUi.h"
-#include "cinder/params/params.h"
+#include "cinder/Log.h"
 
 #include "AssetManager.h"
 #include "MiniConfig.h"
@@ -11,18 +11,13 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-static void prepareAppSettings( App::Settings* settings )
-{
-    readConfig();
-    settings->setWindowSize(APP_WIDTH, APP_HEIGHT);
-    settings->setMultiTouchEnabled(false);        
-}
-
 class _TBOX_PREFIX_App : public App
 {
   public:
     void setup() override
     {
+        log::makeLogger<log::LoggerFile>();
+
         auto triMesh = am::triMesh("Teapot");
         auto aabb = triMesh->calcBoundingBox();
         mMesh = gl::VboMesh::create(*triMesh);
@@ -69,4 +64,8 @@ private:
     CameraUi            mCamUi;
 };
 
-CINDER_APP( _TBOX_PREFIX_App, RendererGl, prepareAppSettings )
+CINDER_APP( _TBOX_PREFIX_App, RendererGl, [](App::Settings* settings) {
+    readConfig();
+    settings->setWindowSize(APP_WIDTH, APP_HEIGHT);
+    settings->setMultiTouchEnabled(false);
+} )
