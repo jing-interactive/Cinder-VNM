@@ -10,6 +10,8 @@
 
 namespace am // am -> asset manager
 {
+    ci::BufferRef& buffer(const std::string& relativeName);
+
     ci::SurfaceRef& surface(const std::string& relativeName);
     ci::ChannelRef& channel(const std::string& relativeName);
     ci::Channel16uRef& channel16u(const std::string& relativeName);

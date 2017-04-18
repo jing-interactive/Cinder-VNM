@@ -50,6 +50,16 @@ namespace
 
 namespace am
 {
+    BufferRef& buffer(const string& relativeName)
+    {
+        auto loader = [](const string & absoluteName, const string&) -> BufferRef
+        {
+            auto source = loadFile(absoluteName);
+            return source->getBuffer();
+        };
+        return getAssetResource<BufferRef>(relativeName, loader);
+    }
+
     SurfaceRef& surface(const string& relativeName)
     {
         auto loader = [](const string & absoluteName, const string&) -> SurfaceRef
