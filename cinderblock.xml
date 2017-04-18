@@ -5,12 +5,13 @@
 	id="org.vnm.utils"
 	author="Vinjn Zhang"
 	license="MIT"
-	summary="Implements the utils"
+	summary="Keep it simple and happy"
 	core="false"
 	>
 	<sourcePattern>src/*.*</sourcePattern>
 	<headerPattern>include/*.*</headerPattern>
 	<includePath>include</includePath>
+	<includePath>../</includePath>
 </block>
 <template>templates/Basic VNM/template.xml</template>
 <template>templates/Minimalist VNM/template.xml</template>
