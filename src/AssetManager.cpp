@@ -28,23 +28,24 @@ namespace
         {
             return it->second;
         }
-        CI_LOG_V("Loading: " << relativeName << " " << relativeNameB);
+
+		auto aPath = getAssetPath(relativeName);
+		if (aPath.empty()) aPath = relativeName;
+		auto bPath = getAssetPath(relativeNameB);
+		if (bPath.empty()) bPath = relativeNameB;
 
         try
         {
-            auto aPath = getAssetPath(relativeName);
-            if (aPath.empty()) aPath = relativeName;
-            auto bPath = getAssetPath(relativeNameB);
-            if (bPath.empty()) bPath = relativeNameB;
-
+			CI_LOG_V("Loading: " << relativeName << " " << relativeNameB);
             auto resource = loadFunc(aPath.string(), bPath.string());
             return sMap[relativeName + relativeNameB] = resource;
         }
         catch (Exception& e)
         {
             CI_LOG_EXCEPTION("getAssetResource", e);
-            return nullResource;
+			sMap[relativeName + relativeNameB] = nullResource;
         }
+		return nullResource;
     }
 }
 
