@@ -40,9 +40,9 @@ namespace cinder { namespace params {
 class InterfaceGl;
 } }
 
-#define ADD_ENUM_TO_INT(param, intValue, enumNames)     \
-    param->removeParam(#intValue);                       \
-    param->addParam(#intValue, enumNames, &intValue);
+#define ADD_ENUM_TO_INT(param, INT_VALUE, vectorOfEnumNames)    \
+    param->removeParam(#INT_VALUE);                             \
+    param->addParam(#INT_VALUE, vectorOfEnumNames, &INT_VALUE);
 
 std::shared_ptr<ci::params::InterfaceGl> createConfigUI(const ci::ivec2& size);
 
