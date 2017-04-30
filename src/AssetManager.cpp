@@ -280,12 +280,17 @@ namespace am
 
     audio::VoiceRef voice(const string& relativeName)
     {
+#if !defined(CINDER_UWP)
         auto loader = [](const string & absoluteName, const string&) -> audio::VoiceRef
         {
             auto source = audio::load(DataSourcePath::create(absoluteName));
             return audio::Voice::create(source);
         };
         return getAssetResource<audio::VoiceRef>(relativeName, loader);
+    }
+#else
+        throw audio::AudioExc("audio is unsupported on UWP");
+#endif
     }
 
 }

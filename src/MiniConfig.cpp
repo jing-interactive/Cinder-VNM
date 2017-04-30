@@ -176,9 +176,7 @@ void takeScreenShot()
 
 shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
 {
-#ifdef CINDER_COCOA_TOUCH
-    return nullptr;
-#else
+#if defined(CINDER_MSW_DESKTOP) || defined(CINDER_LINUX) || defined(CINDER_MAC)
     ivec2 newsize = {size.x, max(size.y, getConfigUIHeight()) };
     
     auto params = params::InterfaceGl::create("MiniConfig", newsize);
@@ -202,6 +200,8 @@ params->addParam(#var, &var).min(Min).max(Max).step(step);  \
     getWindow()->getSignalPostDraw().connect(std::bind(&params::InterfaceGl::draw, params));
     
     return params;
+#else
+    return nullptr;
 #endif
 }
 
