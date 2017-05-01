@@ -287,7 +287,6 @@ namespace am
             return audio::Voice::create(source);
         };
         return getAssetResource<audio::VoiceRef>(relativeName, loader);
-    }
 #else
         throw audio::AudioExc("audio is unsupported on UWP");
 #endif
