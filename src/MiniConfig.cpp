@@ -183,6 +183,7 @@ shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
     params->addButton("SAVE", writeConfig);
     params->addButton("SCREENSHOT", takeScreenShot);
     params->addButton("QUIT", []{App::get()->quit(); });
+    params->setOptions("", "valueswidth=fit");
 #define GROUP_DEF(grp)                  params->addSeparator(#grp);
 #define ITEM_DEF(type, var, default)    params->addParam(#var, &var, #var[0] == '_');
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max)               \
