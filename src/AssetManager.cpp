@@ -29,6 +29,14 @@ namespace
             return it->second;
         }
 
+        static std::once_flag connectCloseSignal;
+        auto fn = [] {
+            getWindow()->getSignalClose().connect([] {
+                sMap.clear();
+            });
+        };
+        std::call_once(connectCloseSignal, fn);
+
 		auto aPath = getAssetPath(relativeName);
 		if (aPath.empty()) aPath = relativeName;
 		auto bPath = getAssetPath(relativeNameB);
@@ -278,7 +286,7 @@ namespace am
         return getAssetResource<vector<string>>(relativeFolderName, bind(loadPaths, placeholders::_1, placeholders::_2, false));
     }
 
-    audio::VoiceRef voice(const string& relativeName)
+    audio::VoiceRef& voice(const string& relativeName)
     {
 #if !defined(CINDER_UWP)
         auto loader = [](const string & absoluteName, const string&) -> audio::VoiceRef

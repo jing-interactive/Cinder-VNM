@@ -40,5 +40,5 @@ namespace am // am -> asset manager
     std::vector<std::string>& longPaths(const std::string& relativeFolderName);
     std::vector<std::string>& shortPaths(const std::string& relativeFolderName);
 
-    ci::audio::VoiceRef voice(const std::string& relativeName);
+    ci::audio::VoiceRef& voice(const std::string& relativeName);
 }
