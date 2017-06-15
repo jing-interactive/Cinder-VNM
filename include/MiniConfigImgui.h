@@ -80,7 +80,7 @@ namespace vnm
             App::get()->quit();
         }
         
-#ifdef _DEBUG
+#ifndef NDEBUG
         static bool isTestWindowOpened = false;
         if (ui::Button("ShowTestWindow"))
             isTestWindowOpened = !isTestWindowOpened;

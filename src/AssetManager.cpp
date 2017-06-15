@@ -265,7 +265,7 @@ namespace am
             if (fs::is_regular_file(*it) && it->path().extension() != ".db"
                 && it->path().extension() != ".DS_Store")
             {
-#ifdef _DEBUG
+#ifndef NDEBUG
                 //console() << it->path() << endl;
 #endif
                 files.push_back(isLongMode ?
