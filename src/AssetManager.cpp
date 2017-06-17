@@ -31,7 +31,7 @@ namespace
 
         static std::once_flag connectCloseSignal;
         auto fn = [] {
-            getWindow()->getSignalClose().connect([] {
+            AppBase::get()->getSignalCleanup().connect([] {
                 sMap.clear();
             });
         };
