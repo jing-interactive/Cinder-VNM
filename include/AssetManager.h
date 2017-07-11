@@ -21,7 +21,7 @@ namespace am // am -> asset manager
     //ci::gl::Texture1dRef& texture1d(const std::string& relativeName, const ci::gl::Texture1d::Format& format = ci::gl::Texture1d::Format());
     ci::gl::Texture2dRef& texture2d(const std::string& relativeName,
                                     const ci::gl::Texture2d::Format& format = ci::gl::Texture2d::Format()
-                                        .mipmap().minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR));
+                                        .mipmap().minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR).wrap(GL_REPEAT));
     ci::gl::TextureCubeMapRef& textureCubeMap(const std::string& relativeName,
                                               const ci::gl::TextureCubeMap::Format& format = ci::gl::TextureCubeMap::Format()
                                               .mipmap().minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR));
