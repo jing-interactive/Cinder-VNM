@@ -11,8 +11,8 @@ struct GlslParamsBuilderImgui
     
     GlslParamsBuilderImgui(ci::gl::GlslProgRef glsl)
     {
-        //
         glslProg = glsl;
+        if (!glslProg) return;
         //
         // glsl reflection: uniform
         //
@@ -27,6 +27,8 @@ struct GlslParamsBuilderImgui
     
     void applyUniforms()
     {
+        if (!glslProg) return;
+
         for (auto& kv : namedInts) glslProg->uniform(kv.first, kv.second);
         for (auto& kv : namedBools) glslProg->uniform(kv.first, kv.second);
         for (auto& kv : namedFloats) glslProg->uniform(kv.first, kv.second);

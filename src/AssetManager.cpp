@@ -111,6 +111,12 @@ namespace am
                 auto source = ip::checkerboard(512, 512);
                 return T::create(source, _format);
             }
+            if (!fs::exists(absoluteName))
+            {
+                CI_LOG_E("Missing file: " << absoluteName);
+                return shared_ptr<T>();
+            }
+
             auto ext = fs::path(absoluteName).extension();
 #if !defined( CINDER_GL_ES ) || defined( CINDER_GL_ANGLE )
             if (ext == ".dds")
@@ -191,7 +197,7 @@ namespace am
             }
             else
             {
-                CI_LOG_W("Unsupported mesh format: " << absoluteName);
+                CI_LOG_E("Unsupported mesh format: " << absoluteName);
                 return nullptr;
             }
 
