@@ -21,8 +21,12 @@ struct GlslParamsBuilderImgui
             return a.getName() < b.getName();
         });
         
-        
-        App::get()->getSignalUpdate().connect(std::bind(&GlslParamsBuilderImgui::drawImgui, this));
+        connection = App::get()->getSignalUpdate().connect(std::bind(&GlslParamsBuilderImgui::drawImgui, this));
+    }
+    
+    ~GlslParamsBuilderImgui()
+    {
+        connection.disconnect();
     }
     
     void applyUniforms()
@@ -48,6 +52,8 @@ struct GlslParamsBuilderImgui
     std::unordered_map<std::string, ci::ColorA> namedColorAs;
     
 private:
+    
+    ci::signals::Connection connection;
     
     template <typename T>
     void addParam(ci::gl::GlslProgRef glsl,
