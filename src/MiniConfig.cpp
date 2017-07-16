@@ -1,5 +1,5 @@
 #include "../include/MiniConfig.h"
-#include <cinder/xml.h>
+#include <cinder/Xml.h>
 #include <cinder/Utilities.h>
 #include <cinder/app/App.h>
 #include <cinder/params/Params.h>

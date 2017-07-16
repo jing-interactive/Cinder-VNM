@@ -8,7 +8,7 @@
 #include "cinder/Function.h"
 #include "cinder/GeomIo.h"
 #include "cinder/gl/Shader.h"
-#include "cinder/ip/checkerboard.h"
+#include "cinder/ip/Checkerboard.h"
 #include <map>
 
 using namespace std;
@@ -100,7 +100,7 @@ namespace am
     }
 
     template <typename T>
-    shared_ptr<T>& texture(const string& relativeName, const typename T::Format& format)
+    shared_ptr<T>& texture(const string& relativeName, const typename T::Format& format, bool isAsyncLoading)
     {
         auto _format = format;
         _format.setLabel(relativeName);
@@ -141,14 +141,14 @@ namespace am
     //    return texture<gl::Texture1d>(relativeName, format);
     //}
 
-    gl::Texture2dRef& texture2d(const std::string& relativeName, const gl::Texture2d::Format& format)
+    gl::Texture2dRef& texture2d(const std::string& relativeName, const gl::Texture2d::Format& format, bool isAsyncLoading)
     {
-        return texture<gl::Texture2d>(relativeName, format);
+        return texture<gl::Texture2d>(relativeName, format, isAsyncLoading);
     }
 
     gl::TextureCubeMapRef& textureCubeMap(const std::string& relativeName, const gl::TextureCubeMap::Format& format)
     {
-        return texture<gl::TextureCubeMap>(relativeName, format);
+        return texture<gl::TextureCubeMap>(relativeName, format, false);
     }
     
     TriMeshRef& triMesh(const string& relativeName)
