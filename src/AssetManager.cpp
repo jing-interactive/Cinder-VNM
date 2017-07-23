@@ -9,6 +9,8 @@
 #include "cinder/GeomIo.h"
 #include "cinder/gl/Shader.h"
 #include "cinder/ip/Checkerboard.h"
+#include "cinder/ConcurrentCircularBuffer.h"
+
 #include <map>
 
 using namespace std;
@@ -17,6 +19,8 @@ using namespace app;
 
 namespace
 {
+    bool sShouldQuit = false;
+
     template <typename T>
     T& getAssetResource(const string& relativeName, function<T(const string&, const string&)> loadFunc, const string& relativeNameB = "")
     {
@@ -32,6 +36,7 @@ namespace
         static std::once_flag connectCloseSignal;
         auto fn = [] {
             AppBase::get()->getSignalCleanup().connect([] {
+                sShouldQuit = true;
                 sMap.clear();
             });
         };
@@ -98,10 +103,20 @@ namespace am
         };
         return getAssetResource<Channel16uRef>(relativeName, loader);
     }
-
+    
     template <typename T>
-    shared_ptr<T>& texture(const string& relativeName, const typename T::Format& format, bool isAsyncLoading)
+    shared_ptr<T>& texture(const string& relativeName, const typename T::Format& format, bool isAsync)
     {
+        int kCircularTextureCount = 20;
+        struct Task
+        {
+            shared_ptr<T> texToBeReplaced;
+            string texFilename;
+        };
+        
+        static ConcurrentCircularBuffer<Task> tasks(kCircularTextureCount);
+        static unique_ptr<thread> textureLoader;
+        
         auto _format = format;
         _format.setLabel(relativeName);
         auto loader = [=](const string & absoluteName, const string&) -> shared_ptr < T >
@@ -133,6 +148,49 @@ namespace am
             auto source = loadImage(absoluteName);
             return T::create(source, _format);
         };
+        
+        // TODO: use call_once
+        if (isAsync)
+        {
+            if (!textureLoader)
+            {
+                gl::ContextRef backgroundCtx = gl::Context::create( gl::context() );
+
+                auto fn = [=](gl::ContextRef context) {
+                    context->makeCurrent();
+                    while (!sShouldQuit)
+                    {
+                        Task task;
+                        if (tasks.tryPopBack(&task))
+                        {
+                            auto newTex = loader(task.texFilename, "");
+                            
+                            // we need to wait on a fence before alerting the primary thread that the Texture is ready
+                            auto fence = gl::Sync::create();
+                            fence->clientWaitSync();
+                            
+                            task.texToBeReplaced.swap(newTex);
+                        }
+                    }
+                };
+                textureLoader = make_unique<thread>(bind(fn, backgroundCtx));
+                
+                AppBase::get()->getSignalCleanup().connect([] {
+                    textureLoader->join();
+                });
+            }
+            
+            auto fakeLoader = [=](const string & absoluteName, const string&) -> shared_ptr < T > {
+                static auto placeholder = ip::checkerboard(64, 64);
+                auto tex = T::create(placeholder, _format);
+                tasks.pushFront({tex, absoluteName});
+                
+                return tex;
+            };
+        
+            return getAssetResource<shared_ptr<T>>(relativeName, fakeLoader);
+        }
+
         return getAssetResource<shared_ptr<T>>(relativeName, loader);
     }
 
@@ -141,14 +199,14 @@ namespace am
     //    return texture<gl::Texture1d>(relativeName, format);
     //}
 
-    gl::Texture2dRef& texture2d(const std::string& relativeName, const gl::Texture2d::Format& format, bool isAsyncLoading)
+    gl::Texture2dRef& texture2d(const std::string& relativeName, const gl::Texture2d::Format& format, bool isAsync)
     {
-        return texture<gl::Texture2d>(relativeName, format, isAsyncLoading);
+        return texture<gl::Texture2d>(relativeName, format, isAsync);
     }
 
-    gl::TextureCubeMapRef& textureCubeMap(const std::string& relativeName, const gl::TextureCubeMap::Format& format)
+    gl::TextureCubeMapRef& textureCubeMap(const std::string& relativeName, const gl::TextureCubeMap::Format& format, bool isAsync)
     {
-        return texture<gl::TextureCubeMap>(relativeName, format, false);
+        return texture<gl::TextureCubeMap>(relativeName, format, isAsync);
     }
     
     TriMeshRef& triMesh(const string& relativeName)

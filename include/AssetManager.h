@@ -22,10 +22,12 @@ namespace am // am -> asset manager
     ci::gl::Texture2dRef& texture2d(const std::string& relativeName,
                                     const ci::gl::Texture2d::Format& format = ci::gl::Texture2d::Format()
                                         .mipmap().minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR).wrap(GL_REPEAT),
-                                    bool isAsyncLoading = false);
+                                    bool isAsync = false);
+
     ci::gl::TextureCubeMapRef& textureCubeMap(const std::string& relativeName,
                                               const ci::gl::TextureCubeMap::Format& format = ci::gl::TextureCubeMap::Format()
-                                              .mipmap().minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR));
+                                              .mipmap().minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR),
+                                              bool isAsync = false);
 
     // Supports obj, msh.
     // Special support: "Rect", "Icosahedron", "Icosphere", "Teapot", "Circle", "Ring", "Sphere", "Capsule" etc
