@@ -8,6 +8,8 @@
 #include "cinder/Function.h"
 #include "cinder/GeomIo.h"
 #include "cinder/gl/Shader.h"
+#include "cinder/gl/Context.h"
+#include "cinder/gl/Sync.h"
 #include "cinder/ip/Checkerboard.h"
 #include "cinder/ConcurrentCircularBuffer.h"
 
