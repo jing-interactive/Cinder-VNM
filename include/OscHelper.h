@@ -11,11 +11,11 @@ struct OscHelper
         try
         {
             sender->bind();
-            CI_LOG_I("sender->bind()" << remoteIp << ":" << remotePort);
+            CI_LOG_I("sender->bind() " << remoteIp << ":" << remotePort);
         }
         catch (const cinder::Exception &ex)
         {
-            CI_LOG_EXCEPTION("sender->bind() fails", ex);
+            CI_LOG_EXCEPTION("sender->bind() fails ", ex);
         }
 
         return sender;
@@ -27,7 +27,7 @@ struct OscHelper
         try
         {
             receiver->bind();
-            CI_LOG_I("sender->bind()" << localPort);
+            CI_LOG_I("sender->bind() " << localPort);
         }
         catch (const cinder::Exception &ex)
         {
