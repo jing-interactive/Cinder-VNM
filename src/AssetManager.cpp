@@ -175,7 +175,7 @@ namespace am
                         }
                     }
                 };
-                textureLoader = make_unique<thread>(bind(fn, backgroundCtx));
+                textureLoader = unique_ptr<thread>(new thread(bind(fn, backgroundCtx)));
                 
                 AppBase::get()->getSignalCleanup().connect([] {
                     textureLoader->join();
