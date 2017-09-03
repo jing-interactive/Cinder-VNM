@@ -24,19 +24,18 @@ void updateTexture(gl::TextureRef &tex, const T &src, const gl::Texture2d::Forma
 static gl::Texture::Format getTextureFormatUINT16()
 {
     return gl::Texture::Format()
-		.dataType(GL_UNSIGNED_SHORT)
-		.internalFormat(GL_R16UI)
-		.immutableStorage();
+        .dataType(GL_UNSIGNED_SHORT)
+        .internalFormat(GL_R16UI)
+        .minFilter(GL_NEAREST)
+        .immutableStorage();
 }
-
-auto cubeMapFormat = gl::TextureCubeMap::Format().mipmap().internalFormat(GL_RGB16F).minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR);
 
 static gl::TextureCubeMap::Format getTextureFormatHDRCubeMap()
 {
-	return gl::TextureCubeMap::Format()
-		.mipmap()
-		.internalFormat(GL_RGB16F)
-		.minFilter(GL_LINEAR_MIPMAP_LINEAR)
-		.magFilter(GL_LINEAR)
-		.immutableStorage();
+    return gl::TextureCubeMap::Format()
+        .mipmap()
+        .internalFormat(GL_RGB16F)
+        .minFilter(GL_LINEAR_MIPMAP_LINEAR)
+        .magFilter(GL_LINEAR)
+        .immutableStorage();
 }
