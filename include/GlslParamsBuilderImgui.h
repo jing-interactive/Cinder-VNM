@@ -79,7 +79,7 @@ private:
             if (uniform.getCount() != 1) continue; // skip array
             if (uniform.getUniformSemantic() != ci::gl::UNIFORM_USER_DEFINED) continue; // skip cinder-defined semantic
             auto name = uniform.getName();
-            auto guiName = label + "::" + name;
+            auto guiName = name + " @ " + label;
             
             switch (uniform.getType())
             {

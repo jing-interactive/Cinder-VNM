@@ -287,7 +287,7 @@ namespace am
 
     gl::GlslProgRef& glslProg(const string& vsFileName, const string& fsFileName, gl::GlslProg::Format format)
     {
-        auto label = vsFileName + "/" + fsFileName;
+        auto label = fs::path(vsFileName).filename().string() + "/" + fs::path(fsFileName).filename().string();
         auto loader = [=, &format](const string & vsAbsoluteName, const string & fsAbsoluteName) -> gl::GlslProgRef
         {
             if (vsAbsoluteName == "texture") return gl::getStockShader(gl::ShaderDef().texture());
