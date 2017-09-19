@@ -285,10 +285,10 @@ namespace am
         return getAssetResource<gl::VboMeshRef>(relativeName, loader);
     }
 
-    gl::GlslProgRef& glslProg(const string& vsFileName, const string& fsFileName)
+    gl::GlslProgRef& glslProg(const string& vsFileName, const string& fsFileName, gl::GlslProg::Format format)
     {
         auto label = vsFileName + "/" + fsFileName;
-        auto loader = [=](const string & vsAbsoluteName, const string & fsAbsoluteName) -> gl::GlslProgRef
+        auto loader = [=, &format](const string & vsAbsoluteName, const string & fsAbsoluteName) -> gl::GlslProgRef
         {
             if (vsAbsoluteName == "texture") return gl::getStockShader(gl::ShaderDef().texture());
             if (vsAbsoluteName == "color") return gl::getStockShader(gl::ShaderDef().color());
@@ -297,7 +297,6 @@ namespace am
             if (vsAbsoluteName == "lambert+texture") return gl::getStockShader(gl::ShaderDef().lambert().texture());
             if (vsAbsoluteName == "lambert+color+texture") return gl::getStockShader(gl::ShaderDef().lambert().color().texture());
             
-            gl::GlslProg::Format format;
 #if defined( CINDER_GL_ES )
             format.version(300); // es 3.0
 #else

@@ -36,7 +36,7 @@ namespace am // am -> asset manager
     ci::gl::VboMeshRef& vboMesh(const std::string& relativeName);
 
     // Special support of vsFileName: "color", "texture", "lambert", "color+texture"
-    ci::gl::GlslProgRef& glslProg(const std::string& vsFileName, const std::string& fsFileName = "");
+    ci::gl::GlslProgRef& glslProg(const std::string& vsFileName, const std::string& fsFileName = "", ci::gl::GlslProg::Format format = {});
 
     std::string& str(const std::string& relativeName);
 
