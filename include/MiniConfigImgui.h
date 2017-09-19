@@ -46,11 +46,25 @@ namespace vnm
         return ui::InputFloat4(label, &v.x, -1, flags);
     }
 
+    bool addImguiParam(const char* label, vec2& v)
+    {
+        ImGuiInputTextFlags flags = 0;
+        if (label[0] == '_') flags = ImGuiInputTextFlags_ReadOnly;
+        return ui::InputFloat2(label, &v.x, -1, flags);
+    }
+
     bool addImguiParam(const char* label, vec3& v)
     {
         ImGuiInputTextFlags flags = 0;
         if (label[0] == '_') flags = ImGuiInputTextFlags_ReadOnly;
         return ui::InputFloat3(label, &v.x, -1, flags);
+    }
+
+    bool addImguiParam(const char* label, vec4& v)
+    {
+        ImGuiInputTextFlags flags = 0;
+        if (label[0] == '_') flags = ImGuiInputTextFlags_ReadOnly;
+        return ui::InputFloat4(label, &v.x, -1, flags);
     }
 
     bool addImguiParam(const char* label, Color& v)

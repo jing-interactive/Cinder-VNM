@@ -36,9 +36,9 @@ struct GlslParamsBuilderImgui
         for (auto& kv : namedInts) glslProg->uniform(kv.first, kv.second);
         for (auto& kv : namedBools) glslProg->uniform(kv.first, kv.second);
         for (auto& kv : namedFloats) glslProg->uniform(kv.first, kv.second);
+        for (auto& kv : namedVec2s) glslProg->uniform(kv.first, kv.second);
         for (auto& kv : namedVec3s) glslProg->uniform(kv.first, kv.second);
-        for (auto& kv : namedColors) glslProg->uniform(kv.first, kv.second);
-        for (auto& kv : namedColorAs) glslProg->uniform(kv.first, kv.second);
+        for (auto& kv : namedVec4s) glslProg->uniform(kv.first, kv.second);
     }
     
     ci::gl::GlslProgRef glslProg;
@@ -47,9 +47,9 @@ struct GlslParamsBuilderImgui
     std::unordered_map<std::string, int> namedInts;
     std::unordered_map<std::string, bool> namedBools;
     std::unordered_map<std::string, float> namedFloats;
+    std::unordered_map<std::string, ci::vec2> namedVec2s;
     std::unordered_map<std::string, ci::vec3> namedVec3s;
-    std::unordered_map<std::string, ci::Color> namedColors;
-    std::unordered_map<std::string, ci::ColorA> namedColorAs;
+    std::unordered_map<std::string, ci::vec4> namedVec4s;
     
 private:
     
@@ -95,9 +95,19 @@ private:
                     addParam(glslProg, guiName, name, namedFloats);
                     break;
                 }
+                case GL_FLOAT_VEC2:
+                {
+                    addParam(glslProg, guiName, name, namedVec2s);
+                    break;
+                }
                 case GL_FLOAT_VEC3:
                 {
-                    addParam(glslProg, guiName, name, namedColors); // namedColors or namedVec3s?
+                    addParam(glslProg, guiName, name, namedVec3s);
+                    break;
+                }
+                case GL_FLOAT_VEC4:
+                {
+                    addParam(glslProg, guiName, name, namedVec4s);
                     break;
                 }
                 case GL_BOOL:
