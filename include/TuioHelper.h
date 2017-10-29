@@ -5,7 +5,6 @@
 
 struct TuioHelper
 {
-#if 0
     static std::unique_ptr<cinder::osc::SenderUdp> createSender(const std::string& remoteIp, uint16_t remotePort)
     {
         auto sender = std::make_unique<cinder::osc::SenderUdp>(10000, remoteIp, remotePort);
@@ -45,7 +44,5 @@ struct TuioHelper
         });
 
         return receiver;
-
-#endif
     }
 };
