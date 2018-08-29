@@ -44,23 +44,30 @@ namespace
         };
         std::call_once(connectCloseSignal, fn);
 
-		auto aPath = getAssetPath(relativeName);
-		if (aPath.empty()) aPath = relativeName;
-		auto bPath = getAssetPath(relativeNameB);
-		if (bPath.empty()) bPath = relativeNameB;
+        fs::path aPath, bPath;
+        if (!relativeName.empty())
+        {
+            aPath = getAssetPath(relativeName);
+        }
+        if (aPath.empty()) aPath = relativeName;
+        if (!relativeNameB.empty())
+        {
+            bPath = getAssetPath(relativeNameB);
+        }
+        if (bPath.empty()) bPath = relativeNameB;
 
         try
         {
-			CI_LOG_V("Loading: " << relativeName << " " << relativeNameB);
+            CI_LOG_V("Loading: " << relativeName << " " << relativeNameB);
             auto resource = loadFunc(aPath.string(), bPath.string());
             return sMap[relativeName + relativeNameB] = resource;
         }
         catch (Exception& e)
         {
             CI_LOG_EXCEPTION("getAssetResource", e);
-			sMap[relativeName + relativeNameB] = nullResource;
+            sMap[relativeName + relativeNameB] = nullResource;
         }
-		return nullResource;
+        return nullResource;
     }
 }
 
@@ -105,7 +112,7 @@ namespace am
         };
         return getAssetResource<Channel16uRef>(relativeName, loader);
     }
-    
+
     template <typename T>
     shared_ptr<T>& texture(const string& relativeName, const typename T::Format& format, bool isAsync)
     {
@@ -115,10 +122,10 @@ namespace am
             shared_ptr<T> texToBeReplaced;
             string texFilename;
         };
-        
+
         static ConcurrentCircularBuffer<Task> tasks(kCircularTextureCount);
         static unique_ptr<thread> textureLoader;
-        
+
         auto _format = format;
         _format.setLabel(relativeName);
         auto loader = [=](const string & absoluteName, const string&) -> shared_ptr < T >
@@ -150,13 +157,13 @@ namespace am
             auto source = loadImage(absoluteName);
             return T::create(source, _format);
         };
-        
+
         // TODO: use call_once
         if (isAsync)
         {
             if (!textureLoader)
             {
-                gl::ContextRef backgroundCtx = gl::Context::create( gl::context() );
+                gl::ContextRef backgroundCtx = gl::Context::create(gl::context());
 
                 auto fn = [=](gl::ContextRef context) {
                     context->makeCurrent();
@@ -166,30 +173,30 @@ namespace am
                         if (tasks.tryPopBack(&task))
                         {
                             auto newTex = loader(task.texFilename, "");
-                            
+
                             // we need to wait on a fence before alerting the primary thread that the Texture is ready
                             auto fence = gl::Sync::create();
                             fence->clientWaitSync();
-                            
+
                             task.texToBeReplaced.swap(newTex);
                         }
                     }
                 };
                 textureLoader = unique_ptr<thread>(new thread(bind(fn, backgroundCtx)));
-                
+
                 AppBase::get()->getSignalCleanup().connect([] {
                     textureLoader->join();
                 });
             }
-            
+
             auto fakeLoader = [=](const string & absoluteName, const string&) -> shared_ptr < T > {
                 static auto placeholder = ip::checkerboard(64, 64);
                 auto tex = T::create(placeholder, _format);
-                tasks.pushFront({tex, absoluteName});
-                
+                tasks.pushFront({ tex, absoluteName });
+
                 return tex;
             };
-        
+
             return getAssetResource<shared_ptr<T>>(relativeName, fakeLoader);
         }
 
@@ -210,7 +217,7 @@ namespace am
     {
         return texture<gl::TextureCubeMap>(relativeName, format, isAsync);
     }
-    
+
     TriMeshRef& triMesh(const string& relativeName)
     {
         auto loader = [](const string & absoluteName, const string&) -> TriMeshRef
@@ -295,13 +302,13 @@ namespace am
                 // Assume it's a stock shader
                 auto def = gl::ShaderDef();
                 if (vsAbsoluteName.find("texture") != string::npos) def = def.texture();
-                if (vsAbsoluteName.find("color") != string::npos) def = def.texture();
-                if (vsAbsoluteName.find("lambert") != string::npos) def = def.texture();
-                if (vsAbsoluteName.find("texture") != string::npos) def = def.texture();
+                if (vsAbsoluteName.find("color") != string::npos) def = def.color();
+                if (vsAbsoluteName.find("lambert") != string::npos) def = def.lambert();
+                if (vsAbsoluteName.find("uniform") != string::npos) def = def.uniformBasedPosAndTexCoord();
 
                 return gl::getStockShader(def);
             }
-            
+
 #if defined( CINDER_GL_ES )
             format.version(300); // es 3.0
 #else
