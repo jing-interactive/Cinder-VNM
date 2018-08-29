@@ -2,7 +2,7 @@
 <cinder>
 <block
 	name="vnm"
-	id="org.vnm.utils"
+	id="org.jing.vnm"
 	author="Vinjn Zhang"
 	license="MIT"
 	summary="Keep it simple and happy"

@@ -294,6 +294,7 @@ namespace am
             if (vsAbsoluteName == "color") return gl::getStockShader(gl::ShaderDef().color());
             if (vsAbsoluteName == "color+texture") return gl::getStockShader(gl::ShaderDef().color().texture());
             if (vsAbsoluteName == "lambert") return gl::getStockShader(gl::ShaderDef().lambert());
+            if (vsAbsoluteName == "lambert+color") return gl::getStockShader(gl::ShaderDef().lambert().color());
             if (vsAbsoluteName == "lambert+texture") return gl::getStockShader(gl::ShaderDef().lambert().texture());
             if (vsAbsoluteName == "lambert+color+texture") return gl::getStockShader(gl::ShaderDef().lambert().color().texture());
             
