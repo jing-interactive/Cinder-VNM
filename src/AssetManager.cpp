@@ -290,13 +290,17 @@ namespace am
         auto label = fs::path(vsFileName).filename().string() + "/" + fs::path(fsFileName).filename().string();
         auto loader = [=, &format](const string & vsAbsoluteName, const string & fsAbsoluteName) -> gl::GlslProgRef
         {
-            if (vsAbsoluteName == "texture") return gl::getStockShader(gl::ShaderDef().texture());
-            if (vsAbsoluteName == "color") return gl::getStockShader(gl::ShaderDef().color());
-            if (vsAbsoluteName == "color+texture") return gl::getStockShader(gl::ShaderDef().color().texture());
-            if (vsAbsoluteName == "lambert") return gl::getStockShader(gl::ShaderDef().lambert());
-            if (vsAbsoluteName == "lambert+color") return gl::getStockShader(gl::ShaderDef().lambert().color());
-            if (vsAbsoluteName == "lambert+texture") return gl::getStockShader(gl::ShaderDef().lambert().texture());
-            if (vsAbsoluteName == "lambert+color+texture") return gl::getStockShader(gl::ShaderDef().lambert().color().texture());
+            if (vsAbsoluteName == fsAbsoluteName || fsAbsoluteName == "")
+            {
+                // Assume it's a stock shader
+                auto def = gl::ShaderDef();
+                if (vsAbsoluteName.find("texture") != string::npos) def = def.texture();
+                if (vsAbsoluteName.find("color") != string::npos) def = def.texture();
+                if (vsAbsoluteName.find("lambert") != string::npos) def = def.texture();
+                if (vsAbsoluteName.find("texture") != string::npos) def = def.texture();
+
+                return gl::getStockShader(def);
+            }
             
 #if defined( CINDER_GL_ES )
             format.version(300); // es 3.0
