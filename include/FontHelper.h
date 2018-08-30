@@ -12,6 +12,6 @@ struct FontHelper
     static ci::gl::TextureFontRef createTextureFont(const std::string& fontName = "Times New Roman", float fontScale = 24)
     {
         auto font = ci::Font(fontName, fontScale);
-        return ci::gl::TextureFont::create(font, gl::TextureFont::Format().premultiply());
+        return ci::gl::TextureFont::create(font, ci::gl::TextureFont::Format().premultiply());
     }
 };
