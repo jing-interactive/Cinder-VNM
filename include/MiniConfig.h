@@ -29,6 +29,7 @@ ITEM_DEF(string, NAME, "vinjn")
 ITEM_DEF(float, velocity, 3.0f)
 
 ITEM_DEF_MINMAX(float, delay, 3.0f, 0.0f, 10.0f)
+
 */
 
 void readConfig();
@@ -40,9 +41,17 @@ namespace cinder { namespace params {
 class InterfaceGl;
 } }
 
-#define ADD_ENUM_TO_INT(param, INT_VALUE, vectorOfEnumNames)    \
-    param->removeParam(#INT_VALUE);                             \
-    param->addParam(#INT_VALUE, vectorOfEnumNames, &INT_VALUE);
+/*
+#include "cinder/params/Params.h"
+
+auto params = createConfigUI({ 200, 300 });
+vector<string> stateNames = { "Earth", "City" };
+ADD_ENUM_TO_INT(params.get(), APP_STATE, stateNames);
+*/
+
+#define ADD_ENUM_TO_INT(params_ptr, INT_VALUE, vectorOfEnumNames)    \
+    params_ptr->removeParam(#INT_VALUE);                             \
+    params_ptr->addParam(#INT_VALUE, vectorOfEnumNames, &INT_VALUE);
 
 std::shared_ptr<ci::params::InterfaceGl> createConfigUI(const ci::ivec2& size);
 
