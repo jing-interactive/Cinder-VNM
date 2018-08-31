@@ -50,6 +50,8 @@ struct State
 {
     typedef std::shared_ptr<State<T>> Ref;
 
+    virtual std::string getName() { return "State"; }
+
     virtual void enter(T* owner)    {};
     virtual void update(T* owner)   {};
     virtual void draw(T* owner)     {};
@@ -62,7 +64,8 @@ struct State
 {\
     static Ref sInstance = Ref(new classname);\
     return sInstance;\
-}
+}\
+std::string getName() {return #classname;}
 
 template <typename T>
 struct StateMachine
