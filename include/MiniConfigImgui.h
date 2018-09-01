@@ -27,6 +27,11 @@ namespace vnm
         return ui::SliderFloat(label, &v, min, max);
     }
 
+    bool addImguiParam(const char* label, int& v, int min, int max)
+    {
+        return ui::SliderInt(label, &v, min, max);
+    }
+
     bool addImguiParam(const char* label, bool& v)
     {
         return ui::Checkbox(label, &v);
@@ -51,6 +56,13 @@ namespace vnm
         ImGuiInputTextFlags flags = 0;
         if (label[0] == '_') flags = ImGuiInputTextFlags_ReadOnly;
         return ui::InputFloat2(label, &v.x, -1, flags);
+    }
+
+    bool addImguiParam(const char* label, ivec2& v)
+    {
+        ImGuiInputTextFlags flags = 0;
+        if (label[0] == '_') flags = ImGuiInputTextFlags_ReadOnly;
+        return ui::InputInt2(label, &v.x, -1, flags);
     }
 
     bool addImguiParam(const char* label, vec3& v)
