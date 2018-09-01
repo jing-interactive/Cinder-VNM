@@ -19,7 +19,7 @@ namespace vnm
 
     bool addImguiParam(const char* label, float& v)
     {
-        return ui::SliderFloat(label, &v, -100.0f, 100.0f);
+        return ui::DragFloat(label, &v);
     }
 
     bool addImguiParam(const char* label, float& v, float min, float max)
