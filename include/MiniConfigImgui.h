@@ -62,7 +62,7 @@ namespace vnm
     {
         ImGuiInputTextFlags flags = 0;
         if (label[0] == '_') flags = ImGuiInputTextFlags_ReadOnly;
-        return ui::InputInt2(label, &v.x, -1, flags);
+        return ui::InputInt2(label, &v.x, flags);
     }
 
     bool addImguiParam(const char* label, vec3& v)
