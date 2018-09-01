@@ -19,56 +19,52 @@ using namespace std;
 using namespace ci;
 using namespace app;
 
-namespace
+static bool sShouldQuit = false;
+template <typename T>
+T& getAssetResource(const string& relativeName, function<T(const string&, const string&)> loadFunc, const string& relativeNameB = "")
 {
-    bool sShouldQuit = false;
-
-    template <typename T>
-    T& getAssetResource(const string& relativeName, function<T(const string&, const string&)> loadFunc, const string& relativeNameB = "")
+    typedef map<string, T> MapType;
+    static MapType sMap;
+    static T nullResource;
+    auto it = sMap.find(relativeName + relativeNameB);
+    if (it != sMap.end())
     {
-        typedef map<string, T> MapType;
-        static MapType sMap;
-        static T nullResource;
-        auto it = sMap.find(relativeName + relativeNameB);
-        if (it != sMap.end())
-        {
-            return it->second;
-        }
-
-        static std::once_flag connectCloseSignal;
-        auto fn = [] {
-            AppBase::get()->getSignalCleanup().connect([] {
-                sShouldQuit = true;
-                sMap.clear();
-            });
-        };
-        std::call_once(connectCloseSignal, fn);
-
-        fs::path aPath, bPath;
-        if (!relativeName.empty())
-        {
-            aPath = getAssetPath(relativeName);
-        }
-        if (aPath.empty()) aPath = relativeName;
-        if (!relativeNameB.empty())
-        {
-            bPath = getAssetPath(relativeNameB);
-        }
-        if (bPath.empty()) bPath = relativeNameB;
-
-        try
-        {
-            CI_LOG_V("Loading: " << relativeName << " " << relativeNameB);
-            auto resource = loadFunc(aPath.string(), bPath.string());
-            return sMap[relativeName + relativeNameB] = resource;
-        }
-        catch (Exception& e)
-        {
-            CI_LOG_EXCEPTION("getAssetResource", e);
-            sMap[relativeName + relativeNameB] = nullResource;
-        }
-        return nullResource;
+        return it->second;
     }
+
+    static std::once_flag connectCloseSignal;
+    auto fn = [] {
+        AppBase::get()->getSignalCleanup().connect([] {
+            sShouldQuit = true;
+            sMap.clear();
+        });
+    };
+    std::call_once(connectCloseSignal, fn);
+
+    fs::path aPath, bPath;
+    if (!relativeName.empty())
+    {
+        aPath = getAssetPath(relativeName);
+    }
+    if (aPath.empty()) aPath = relativeName;
+    if (!relativeNameB.empty())
+    {
+        bPath = getAssetPath(relativeNameB);
+    }
+    if (bPath.empty()) bPath = relativeNameB;
+
+    try
+    {
+        CI_LOG_V("Loading: " << relativeName << " " << relativeNameB);
+        auto resource = loadFunc(aPath.string(), bPath.string());
+        return sMap[relativeName + relativeNameB] = resource;
+    }
+    catch (Exception& e)
+    {
+        CI_LOG_EXCEPTION("getAssetResource", e);
+        sMap[relativeName + relativeNameB] = nullResource;
+    }
+    return nullResource;
 }
 
 namespace am
