@@ -1,6 +1,6 @@
 #pragma once
 
-#include <time.h>       /* time_t, struct tm, time, localtime, asctime */
+#if defined( CINDER_MSW )
 #include <string>
 #include <windows.h>
 
@@ -68,3 +68,4 @@ static std::string Utf8ToAnsi( const std::string& str )
 {
     return Utf16ToAnsi(Utf8ToUtf16(str));
 }
+#endif
