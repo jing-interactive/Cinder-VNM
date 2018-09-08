@@ -24,8 +24,10 @@ class _TBOX_PREFIX_App : public App
         
         createConfigUI({200, 200});
         gl::enableDepth();
-    
+
         getWindow()->getSignalResize().connect([&] {
+            APP_WIDTH = getWindowWidth();
+            APP_HEIGHT = getWindowHeight();
             mCam.setAspectRatio( getWindowAspectRatio() );
         });
 
