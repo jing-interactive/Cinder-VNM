@@ -200,11 +200,11 @@ params->addParam(#var, &var).min(Min).max(Max).step(step);  \
     params->addSeparator();
     
     getWindow()->getSignalPostDraw().connect([params] {
-#if defined( CINDER_GL_HAS_KHR_DEBUG )
+#if defined( CINDER_MSW_DESKTOP )
         gl::pushDebugGroup("MiniConfig::UI");
 #endif
         params->draw();
-#if defined( CINDER_GL_HAS_KHR_DEBUG )
+#if defined( CINDER_MSW_DESKTOP )
         gl::popDebugGroup();
 #endif
     });
