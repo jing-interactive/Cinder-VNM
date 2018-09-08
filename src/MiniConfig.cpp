@@ -198,7 +198,15 @@ params->addParam(#var, &var).min(Min).max(Max).step(step);  \
 #undef GROUP_DEF
     params->addSeparator();
     
-    getWindow()->getSignalPostDraw().connect(std::bind(&params::InterfaceGl::draw, params));
+    getWindow()->getSignalPostDraw().connect([&] {
+#if defined( CINDER_GL_HAS_KHR_DEBUG )
+        gl::pushDebugGroup("MiniConfig::UI");
+#endif
+        params->draw();
+#if defined( CINDER_GL_HAS_KHR_DEBUG )
+        gl::popDebugGroup();
+#endif
+    });
     
     return params;
 #else
