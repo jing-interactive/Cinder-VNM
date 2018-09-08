@@ -128,7 +128,7 @@ namespace am
         {
             if (absoluteName == "checkerboard")
             {
-                auto source = ip::checkerboard(512, 512);
+                auto source = ip::checkerboard(2048, 2048);
                 return T::create(source, _format);
             }
             if (!fs::exists(absoluteName))
