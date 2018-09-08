@@ -1,5 +1,6 @@
 #include "../include/MiniConfig.h"
 #include <cinder/Xml.h>
+#include <cinder/gl/wrapper.h>
 #include <cinder/Utilities.h>
 #include <cinder/app/App.h>
 #include <cinder/params/Params.h>
@@ -198,7 +199,7 @@ params->addParam(#var, &var).min(Min).max(Max).step(step);  \
 #undef GROUP_DEF
     params->addSeparator();
     
-    getWindow()->getSignalPostDraw().connect([&] {
+    getWindow()->getSignalPostDraw().connect([params] {
 #if defined( CINDER_GL_HAS_KHR_DEBUG )
         gl::pushDebugGroup("MiniConfig::UI");
 #endif
