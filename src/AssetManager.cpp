@@ -61,7 +61,7 @@ T& getAssetResource(const string& relativeName, function<T(const string&, const 
     }
     catch (Exception& e)
     {
-        CI_LOG_EXCEPTION("getAssetResource", e);
+        CI_LOG_E(cinder::System::demangleTypeName(typeid(e).name()) << ", reason: \n" << e.what());
         sMap[relativeName + relativeNameB] = nullResource;
     }
     return nullResource;
