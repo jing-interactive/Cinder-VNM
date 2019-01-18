@@ -107,11 +107,11 @@ namespace vnm
         }
         
 #ifndef NDEBUG
-        static bool isTestWindowOpened = false;
-        if (ui::Button("ShowTestWindow"))
-            isTestWindowOpened = !isTestWindowOpened;
-        if (isTestWindowOpened)
-            ui::ShowTestWindow(&isTestWindowOpened);
+        static bool isDemoWindowOpened = false;
+        if (ui::Button("ShowDemoWindow"))
+            isDemoWindowOpened = !isDemoWindowOpened;
+        if (isDemoWindowOpened)
+            ui::ShowDemoWindow(&isDemoWindowOpened);
 #endif  
         
 #define GROUP_DEF(grp)                      } if (ui::CollapsingHeader(#grp, ImGuiTreeNodeFlags_DefaultOpen)) {
