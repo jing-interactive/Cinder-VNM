@@ -31,9 +31,9 @@ namespace am // am -> asset manager
 
     // Supports obj, msh.
     // Special support: "Rect", "Icosahedron", "Icosphere", "Teapot", "Circle", "Ring", "Sphere", "Capsule" etc
-    ci::TriMeshRef& triMesh(const std::string& relativeName);
+    ci::TriMeshRef& triMesh(const std::string& objFileName, const std::string& mtlFileName = "");
 
-    ci::gl::VboMeshRef& vboMesh(const std::string& relativeName);
+    ci::gl::VboMeshRef& vboMesh(const std::string& objFileName, const std::string& mtlFileName = "");
 
     // Special support built-in shaders: "lambert texture", "color", "texture", "lambert", "color texture" etc
     ci::gl::GlslProgRef& glslProg(const std::string& vsFileName, const std::string& fsFileName = "", ci::gl::GlslProg::Format format = {});

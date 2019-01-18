@@ -214,11 +214,11 @@ namespace am
         return texture<gl::TextureCubeMap>(relativeName, format, isAsync);
     }
 
-    TriMeshRef& triMesh(const string& relativeName)
+    TriMeshRef& triMesh(const string& objFileName, const std::string& mtlFileName)
     {
-        auto loader = [](const string & absoluteName, const string&) -> TriMeshRef
+        auto loader = [](const string & absObjFileName, const string& absMtlFileName) -> TriMeshRef
         {
-#define ENTRY(name)  if (absoluteName == #name) return TriMesh::create(geom::name());
+#define ENTRY(name)  if (absObjFileName == #name) return TriMesh::create(geom::name());
             ENTRY(Rect);
             ENTRY(RoundedRect);
             ENTRY(Cube);
@@ -244,14 +244,23 @@ namespace am
             ENTRY(WireSphere);
             ENTRY(WireTorus);
 #undef ENTRY
-            auto source = DataSourcePath::create(absoluteName);
-            auto ext = fs::path(absoluteName).extension();
+            auto source = DataSourcePath::create(absObjFileName);
+            auto ext = fs::path(absObjFileName).extension();
             TriMeshRef mesh;
 
             if (ext == ".obj")
             {
-                ObjLoader loader(source);
-                mesh = TriMesh::create(loader);
+                if (absMtlFileName.empty())
+                {
+                    ObjLoader loader(source);
+                    mesh = TriMesh::create(loader);
+                }
+                else
+                {
+                    auto mtlSource = DataSourcePath::create(absMtlFileName);
+                    ObjLoader loader(source, mtlSource);
+                    mesh = TriMesh::create(loader);
+                }
             }
             else if (ext == ".msh")
             {
@@ -260,7 +269,7 @@ namespace am
             }
             else
             {
-                CI_LOG_E("Unsupported mesh format: " << absoluteName);
+                CI_LOG_E("Unsupported mesh format: " << absObjFileName);
                 return nullptr;
             }
 
@@ -274,18 +283,18 @@ namespace am
 
             return mesh;
         };
-        return getAssetResource<TriMeshRef>(relativeName, loader);
+        return getAssetResource<TriMeshRef>(objFileName, loader, mtlFileName);
     }
 
-    gl::VboMeshRef& vboMesh(const string& relativeName)
+    gl::VboMeshRef& vboMesh(const string& objFileName, const string& mtlFileName)
     {
-        auto tri = triMesh(relativeName);
+        auto tri = triMesh(objFileName, mtlFileName);
         auto loader = [&tri](const string & absoluteName, const string&) -> gl::VboMeshRef
         {
             return gl::VboMesh::create(*tri);
         };
 
-        return getAssetResource<gl::VboMeshRef>(relativeName, loader);
+        return getAssetResource<gl::VboMeshRef>(objFileName, loader, mtlFileName);
     }
 
     gl::GlslProgRef& glslProg(const string& vsFileName, const string& fsFileName, gl::GlslProg::Format format)
