@@ -62,6 +62,11 @@ void readConfig()
 
 void writeConfig()
 {
+#ifdef CINDER_COCOA_TOUCH
+    // TODO: how to enable writing in iOS?
+    return;
+#endif
+
     fs::path configPath = app::getAppPath() / kConfigFileName;
     try
     {
