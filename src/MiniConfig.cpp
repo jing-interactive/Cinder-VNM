@@ -196,7 +196,7 @@ shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max)               \
 do                                                              \
 {                                                               \
-type step = (Max - Min) / (type)500;                        \
+type step = (Max - Min) / (type)10000;                        \
 params->addParam(#var, &var).min(Min).max(Max).step(step);  \
 } while(0);
 #include "item.def"
