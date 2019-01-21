@@ -29,7 +29,6 @@ namespace
 void readConfig()
 {
     fs::path configPath = app::getAppPath() / kConfigFileName;
-
     try
     {
         XmlTree tree(loadFile(configPath));
@@ -191,13 +190,15 @@ shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
     params->addButton("SCREENSHOT", takeScreenShot);
     params->addButton("QUIT", []{App::get()->quit(); });
     params->setOptions("", "valueswidth=fit");
-#define GROUP_DEF(grp)                  params->addSeparator(#grp);
-#define ITEM_DEF(type, var, default)    params->addParam(#var, &var, #var[0] == '_');
-#define ITEM_DEF_MINMAX(type, var, default, Min, Max)               \
-do                                                              \
-{                                                               \
-type step = (Max - Min) / (type)10000;                        \
-params->addParam(#var, &var).min(Min).max(Max).step(step);  \
+    params->addSeparator();
+    string groupName = "Config";
+#define GROUP_DEF(grp)                  groupName = #grp;
+#define ITEM_DEF(type, var, default)    params->addParam(#var, &var, #var[0] == '_').group(groupName);
+#define ITEM_DEF_MINMAX(type, var, default, Min, Max)       \
+do                                                          \
+{                                                           \
+type step = (Max - Min) / (type)500;                        \
+params->addParam(#var, &var).min(Min).max(Max).step(step).group(groupName);  \
 } while(0);
 #include "item.def"
 #undef ITEM_DEF_MINMAX
