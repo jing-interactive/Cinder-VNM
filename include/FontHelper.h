@@ -12,7 +12,9 @@ struct FontHelper
     // gl::TextureFontRef texFont = createTextureFont();
     // texFont->drawString(str, {30, 30});
 
-    static ci::gl::TextureFontRef createTextureFont(const std::string& fontName = "Times New Roman", float fontScale = 24)
+    // sans-serif: Helvetica, Arial, Verdana, Trebuchet MS
+    // serif: Georgia, Times New Roman, Courier
+    static ci::gl::TextureFontRef createTextureFont(const std::string& fontName = "Helvetica", float fontScale = 24)
     {
         auto font = ci::Font(fontName, fontScale);
         return ci::gl::TextureFont::create(font, ci::gl::TextureFont::Format().premultiply());
