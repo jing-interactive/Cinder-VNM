@@ -18,12 +18,18 @@ namespace am // am -> asset manager
 
     // Supports jpg, png, bmp, tga, dds, ktx, hdr etc.
     // Special support: "checkerboard"
-    //ci::gl::Texture1dRef& texture1d(const std::string& relativeName, const ci::gl::Texture1d::Format& format = ci::gl::Texture1d::Format());
+#if ! defined( CINDER_GL_ES )
+    //ci::gl::Texture1dRef& texture1d(const std::string& relativeName, const ci::gl::Texture1d::Format& format = ci::gl::Texture1d::Format(), bool isAsync = false);
+#endif
     ci::gl::Texture2dRef& texture2d(const std::string& relativeName,
                                     const ci::gl::Texture2d::Format& format = ci::gl::Texture2d::Format()
                                         .mipmap().minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR).wrap(GL_REPEAT),
                                     bool isAsync = false);
-
+#if ! defined( CINDER_GL_ES_2 )
+    ci::gl::Texture3dRef& texture3d(const std::string& relativeName, const ci::gl::Texture3d::Format& format = ci::gl::Texture3d::Format()
+                                    .mipmap().minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR),
+                                    bool isAsync = false);
+#endif
     ci::gl::TextureCubeMapRef& textureCubeMap(const std::string& relativeName,
                                               const ci::gl::TextureCubeMap::Format& format = ci::gl::TextureCubeMap::Format()
                                               .mipmap().minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR),

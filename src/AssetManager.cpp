@@ -199,15 +199,24 @@ namespace am
         return getAssetResource<shared_ptr<T>>(relativeName, loader);
     }
 
-    //gl::Texture1dRef& texture1d(const std::string& relativeName, const gl::Texture1d::Format& format)
+#if ! defined( CINDER_GL_ES )
+    //gl::Texture1dRef& texture1d(const std::string& relativeName, const gl::Texture1d::Format& format, bool isAsync)
     //{
-    //    return texture<gl::Texture1d>(relativeName, format);
+    //    return texture<gl::Texture1d>(relativeName, format, isAsync);
     //}
+#endif
 
     gl::Texture2dRef& texture2d(const std::string& relativeName, const gl::Texture2d::Format& format, bool isAsync)
     {
         return texture<gl::Texture2d>(relativeName, format, isAsync);
     }
+
+#if ! defined( CINDER_GL_ES_2 )
+    gl::Texture3dRef& texture3d(const std::string& relativeName, const gl::Texture3d::Format& format, bool isAsync)
+    {
+        return texture<gl::Texture3d>(relativeName, format, isAsync);
+    }
+#endif
 
     gl::TextureCubeMapRef& textureCubeMap(const std::string& relativeName, const gl::TextureCubeMap::Format& format, bool isAsync)
     {
