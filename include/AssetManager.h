@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#define TEXTURE_3D_ENABLED 0
+
 namespace am // am -> asset manager
 {
     ci::BufferRef& buffer(const std::string& relativeName);
@@ -25,7 +27,7 @@ namespace am // am -> asset manager
                                     const ci::gl::Texture2d::Format& format = ci::gl::Texture2d::Format()
                                         .mipmap().minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR).wrap(GL_REPEAT),
                                     bool isAsync = false);
-#if ! defined( CINDER_GL_ES_2 )
+#if TEXTURE_3D_ENABLED
     ci::gl::Texture3dRef& texture3d(const std::string& relativeName, const ci::gl::Texture3d::Format& format = ci::gl::Texture3d::Format()
                                     .mipmap().minFilter(GL_LINEAR_MIPMAP_LINEAR).magFilter(GL_LINEAR),
                                     bool isAsync = false);

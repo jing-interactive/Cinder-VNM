@@ -211,7 +211,7 @@ namespace am
         return texture<gl::Texture2d>(relativeName, format, isAsync);
     }
 
-#if ! defined( CINDER_GL_ES_2 )
+#if TEXTURE_3D_ENABLED
     gl::Texture3dRef& texture3d(const std::string& relativeName, const gl::Texture3d::Format& format, bool isAsync)
     {
         return texture<gl::Texture3d>(relativeName, format, isAsync);
