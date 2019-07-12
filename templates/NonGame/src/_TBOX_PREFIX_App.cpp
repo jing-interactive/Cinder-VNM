@@ -21,6 +21,8 @@ class _TBOX_PREFIX_App : public App
         getWindow()->getSignalKeyUp().connect([&](KeyEvent& event) {
             if (event.getCode() == KeyEvent::KEY_ESCAPE) quit();
         });
+
+        getSignalCleanup().connect([&] { writeConfig(); });
         
         getWindow()->getSignalDraw().connect([&] {
             gl::clear();

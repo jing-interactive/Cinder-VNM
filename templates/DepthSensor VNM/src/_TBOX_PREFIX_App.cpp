@@ -43,6 +43,8 @@ class _TBOX_PREFIX_App : public App
             mCam.setAspectRatio( getWindowAspectRatio() );
         });
 
+        getSignalCleanup().connect([&] { writeConfig(); });
+
         getWindow()->getSignalKeyUp().connect([&](KeyEvent& event) {
             if (event.getCode() == KeyEvent::KEY_ESCAPE) quit();
         });
