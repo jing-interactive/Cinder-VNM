@@ -34,7 +34,7 @@ T& getAssetResource(const string& relativeName, function<T(const string&, const 
 
     static std::once_flag connectCloseSignal;
     auto fn = [] {
-        AppBase::get()->getSignalCleanup().connect([] {
+        App::get()->getSignalCleanup().connect([] {
             sShouldQuit = true;
             sMap.clear();
         });
@@ -69,6 +69,12 @@ T& getAssetResource(const string& relativeName, function<T(const string&, const 
 
 namespace am
 {
+    void addAssetDirectory(const fs::path& dirPath)
+    {
+        if (fs::exists(dirPath))
+            app::addAssetDirectory(dirPath);
+    }
+
     BufferRef& buffer(const string& relativeName)
     {
         auto loader = [](const string & absoluteName, const string&) -> BufferRef
@@ -79,14 +85,37 @@ namespace am
         return getAssetResource<BufferRef>(relativeName, loader);
     }
 
-    SurfaceRef& surface(const string& relativeName)
+    SurfaceRef& surface(const string& relativeName, bool forceAlpha)
     {
-        auto loader = [](const string & absoluteName, const string&) -> SurfaceRef
+        auto loader = [forceAlpha](const string & absoluteName, const string&) -> SurfaceRef
         {
             auto source = loadImage(absoluteName);
-            return Surface::create(source);
+            bool hasAlpha = source->hasAlpha() || forceAlpha;
+            return Surface::create(source, SurfaceConstraintsDefault(), hasAlpha);
         };
         return getAssetResource<SurfaceRef>(relativeName, loader);
+    }
+
+    Surface16uRef& surface16u(const string& relativeName, bool forceAlpha)
+    {
+        auto loader = [forceAlpha](const string& absoluteName, const string&) -> Surface16uRef
+        {
+            auto source = loadImage(absoluteName);
+            bool hasAlpha = source->hasAlpha() || forceAlpha;
+            return Surface16u::create(source, SurfaceConstraintsDefault(), hasAlpha);
+        };
+        return getAssetResource<Surface16uRef>(relativeName, loader);
+    }
+
+    Surface32fRef& surface32f(const string& relativeName, bool forceAlpha)
+    {
+        auto loader = [forceAlpha](const string& absoluteName, const string&) -> Surface32fRef
+        {
+            auto source = loadImage(absoluteName);
+            bool hasAlpha = source->hasAlpha() || forceAlpha;
+            return Surface32f::create(source, SurfaceConstraintsDefault(), hasAlpha);
+        };
+        return getAssetResource<Surface32fRef>(relativeName, loader);
     }
 
     ChannelRef& channel(const std::string& relativeName)
@@ -180,7 +209,7 @@ namespace am
                 };
                 textureLoader = unique_ptr<thread>(new thread(bind(fn, backgroundCtx)));
 
-                AppBase::get()->getSignalCleanup().connect([] {
+                App::get()->getSignalCleanup().connect([] {
                     textureLoader->join();
                 });
             }
@@ -379,7 +408,7 @@ namespace am
 
     audio::VoiceRef& voice(const string& relativeName)
     {
-#if !defined(CINDER_UWP)
+#if defined(CINDER_MSW)
         auto loader = [](const string & absoluteName, const string&) -> audio::VoiceRef
         {
             auto source = audio::load(DataSourcePath::create(absoluteName));
@@ -387,7 +416,7 @@ namespace am
         };
         return getAssetResource<audio::VoiceRef>(relativeName, loader);
 #else
-        throw audio::AudioExc("audio is unsupported on UWP");
+        throw audio::AudioExc("ci::audio is unsupported");
 #endif
     }
 

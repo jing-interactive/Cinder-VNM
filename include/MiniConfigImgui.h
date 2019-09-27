@@ -96,6 +96,10 @@ namespace vnm
         {
             writeConfig();
         }
+        if (ui::Button("Remotery Profiler"))
+        {
+            launchWebBrowser(Url(getAssetPath("vis/index.html").string(), true));
+        }
 
         if (ui::Button("Screen-shot"))
         {
@@ -106,7 +110,7 @@ namespace vnm
             App::get()->quit();
         }
         
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(IMGUI_DISABLE_DEMO_WINDOWS)
         static bool isDemoWindowOpened = false;
         if (ui::Button("ShowDemoWindow"))
             isDemoWindowOpened = !isDemoWindowOpened;
@@ -126,8 +130,9 @@ namespace vnm
     }
 }
 
-void createConfigImgui()
+void createConfigImgui(WindowRef window = getWindow())
 {
-    ui::initialize();
+    auto optiion = ui::Options().window(window);
+    ui::initialize(optiion);
     App::get()->getSignalUpdate().connect(vnm::drawImgui);
 }

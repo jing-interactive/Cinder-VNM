@@ -187,6 +187,9 @@ shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
     
     auto params = params::InterfaceGl::create("MiniConfig", newsize);
     params->addButton("SAVE", writeConfig);
+    params->addButton("PROFILER", [] {
+        launchWebBrowser(Url(getAssetPath("vis/index.html").string(), true));
+        });
     params->addButton("SCREENSHOT", takeScreenShot);
     params->addButton("QUIT", []{App::get()->quit(); });
     params->setOptions("", "valueswidth=fit");

@@ -12,9 +12,13 @@
 
 namespace am // am -> asset manager
 {
+    void addAssetDirectory(const ci::fs::path& dirPath);
+
     ci::BufferRef& buffer(const std::string& relativeName);
 
-    ci::SurfaceRef& surface(const std::string& relativeName);
+    ci::SurfaceRef& surface(const std::string& relativeName, bool forceAlpha = false);
+    ci::Surface16uRef& surface16u(const std::string& relativeName, bool forceAlpha = false);
+    ci::Surface32fRef& surface32f(const std::string& relativeName, bool forceAlpha = false);
     ci::ChannelRef& channel(const std::string& relativeName);
     ci::Channel16uRef& channel16u(const std::string& relativeName);
 
