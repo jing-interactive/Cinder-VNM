@@ -16,7 +16,7 @@ class _TBOX_PREFIX_App : public App
   public:
     void setup() override
     {
-        log::makeLogger<log::LoggerFile>();
+        log::makeLogger<log::LoggerFileRotating>(fs::path(), "IG.%Y.%m.%d.log");
         
         auto aabb = am::triMesh(MESH_NAME)->calcBoundingBox();
         mCam.lookAt(aabb.getMax() * 2.0f, aabb.getCenter());

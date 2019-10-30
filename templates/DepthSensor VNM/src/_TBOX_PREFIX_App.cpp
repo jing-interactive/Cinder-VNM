@@ -18,7 +18,7 @@ class _TBOX_PREFIX_App : public App
     void setup() override
     {
         const auto& args = getCommandLineArgs();
-        log::makeLogger<log::LoggerFile>();
+        log::makeLogger<log::LoggerFileRotating>(fs::path(), "IG.%Y.%m.%d.log");
 
         ds::DeviceType type = (ds::DeviceType)SENSOR_TYPE;
         ds::Option option;
