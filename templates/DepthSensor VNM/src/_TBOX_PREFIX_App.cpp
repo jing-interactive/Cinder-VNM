@@ -12,9 +12,8 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-class _TBOX_PREFIX_App : public App
+struct _TBOX_PREFIX_App : public App
 {
-  public:
     void setup() override
     {
         const auto& args = getCommandLineArgs();
@@ -58,7 +57,6 @@ class _TBOX_PREFIX_App : public App
         });
     }
     
-private:
     CameraPersp         mCam;
     CameraUi            mCamUi;
     Channel16u          mDepthChannel;

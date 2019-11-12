@@ -10,9 +10,8 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-class _TBOX_PREFIX_App : public App
+struct _TBOX_PREFIX_App : public App
 {
-  public:
     void setup() override
     {
         log::makeLogger<log::LoggerFileRotating>(fs::path(), "IG.%Y.%m.%d.log");
@@ -28,8 +27,6 @@ class _TBOX_PREFIX_App : public App
             gl::clear();
         });
     }
-    
-private:
 };
 
 CINDER_APP( _TBOX_PREFIX_App, RendererGl, [](App::Settings* settings) {
