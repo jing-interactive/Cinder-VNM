@@ -163,7 +163,8 @@ namespace am
             if (!fs::exists(absoluteName))
             {
                 CI_LOG_E("Missing file: " << absoluteName);
-                return shared_ptr<T>();
+                auto source = ip::checkerboard(512, 512);
+                return T::create(source, _format);
             }
 
             auto ext = fs::path(absoluteName).extension();
