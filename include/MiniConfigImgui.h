@@ -139,5 +139,6 @@ void createConfigImgui(WindowRef window = getWindow(), bool autoDraw = true)
 {
     auto optiion = ui::Options().window(window);
     ui::initialize(optiion);
-    App::get()->getSignalUpdate().connect([autoDraw] {vnm::drawMinicofigImgui(autoDraw); });
+    if (autoDraw)
+        App::get()->getSignalUpdate().connect([] {vnm::drawMinicofigImgui(true); });
 }
