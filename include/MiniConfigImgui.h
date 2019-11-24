@@ -89,9 +89,11 @@ namespace vnm
         return ui::ColorEdit4(label, &v.r, true);
     }
 
-    void drawImgui()
+    void drawMinicofigImgui(bool createNewWindow = false)
     {
-        ui::ScopedWindow window("Config");
+        if (createNewWindow)
+            ui::Begin("Config");
+
         if (ui::Button("Save Config"))
         {
             writeConfig();
@@ -127,12 +129,15 @@ namespace vnm
 #undef ITEM_DEF_MINMAX
 #undef ITEM_DEF
 #undef GROUP_DEF
+
+        if (createNewWindow)
+            ui::End();
     }
 }
 
-void createConfigImgui(WindowRef window = getWindow())
+void createConfigImgui(WindowRef window = getWindow(), bool autoDraw = true)
 {
     auto optiion = ui::Options().window(window);
     ui::initialize(optiion);
-    App::get()->getSignalUpdate().connect(vnm::drawImgui);
+    App::get()->getSignalUpdate().connect([autoDraw] {vnm::drawMinicofigImgui(autoDraw); });
 }
