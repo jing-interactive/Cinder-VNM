@@ -55,7 +55,7 @@ T& getAssetResource(const string& relativeName, function<T(const string&, const 
 
     try
     {
-        CI_LOG_V("Loading: " << relativeName << " " << relativeNameB);
+        CI_LOG_I("Loading: " << relativeName << " " << relativeNameB);
         auto resource = loadFunc(aPath.string(), bPath.string());
         return sMap[relativeName + relativeNameB] = resource;
     }
