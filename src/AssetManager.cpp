@@ -144,7 +144,6 @@ namespace am
         int kCircularTextureCount = 20;
         struct Task
         {
-            shared_ptr<T> texToBeReplaced;
             string texFilename;
         };
 
@@ -204,7 +203,7 @@ namespace am
                             auto fence = gl::Sync::create();
                             fence->clientWaitSync();
 
-                            task.texToBeReplaced.swap(newTex);
+                            texture<T>(task.texFilename, format, true) = newTex;
                         }
                     }
                 };
@@ -217,8 +216,8 @@ namespace am
 
             auto fakeLoader = [=](const string & absoluteName, const string&) -> shared_ptr < T > {
                 static auto placeholder = ip::checkerboard(64, 64);
-                auto tex = T::create(placeholder, _format);
-                tasks.pushFront({ tex, absoluteName });
+                static auto tex = T::create(placeholder, _format);
+                tasks.pushFront({ absoluteName });
 
                 return tex;
             };

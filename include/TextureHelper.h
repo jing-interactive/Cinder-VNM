@@ -39,3 +39,12 @@ static gl::TextureCubeMap::Format getTextureFormatHDRCubeMap()
         .magFilter(GL_LINEAR)
         .immutableStorage();
 }
+
+static gl::Texture::Format getTextureFormatDefault()
+{
+    return gl::Texture::Format()
+        .mipmap()
+        .minFilter(GL_LINEAR_MIPMAP_LINEAR)
+        .magFilter(GL_LINEAR)
+        .wrap(GL_REPEAT);
+}
