@@ -12,6 +12,16 @@ using namespace std;
 
 namespace vnm
 {
+    void drawFrameTime()
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        static float values[600] = {};
+        static int values_offset = 0;
+        values[values_offset] = io.DeltaTime * 1000;
+        values_offset = (values_offset + 1) % IM_ARRAYSIZE(values);
+        ImGui::PlotLines("frame time (ms)", values, IM_ARRAYSIZE(values), values_offset, NULL, 0.0f, 30, ImVec2(0, 80));
+    }
+
     bool addImguiParam(const char* label, int& v)
     {
         return ImGui::DragInt(label, &v);
