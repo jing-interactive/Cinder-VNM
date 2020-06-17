@@ -23,35 +23,41 @@ using namespace std;
 
 void readConfig()
 {
-    fs::path configPath = app::getAppPath() / CONFIG_XML;
+    fs::path configPath = app::getAppPath() / ITEM_DEF_FILE;
+    XmlTree tree;
     try
     {
-        XmlTree tree(loadFile(configPath));
-        XmlTree group;
-
-#define GROUP_DEF(grp) group = tree.getChild(#grp);
-#define ITEM_DEF(type, var, default)                        \
-    do                                                      \
-    {                                                       \
-        if (group.getTag().empty())                         \
-            var = tree.getChild(#var).getValue<type>();     \
-        else                                                \
-            var = group.getChild(#var).getValue<type>();    \
-    } while (0);
-#define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
-#include ITEM_DEF_FILE
-#undef ITEM_DEF_MINMAX
-#undef ITEM_DEF
-#undef GROUP_DEF
-        console() << "Reads from " << configPath.string() << endl;
+        tree = XmlTree(loadFile(configPath));
     }
     catch (exception& e)
     {
         console() << e.what() << endl;
         console() << "[Warning] Fails to read from " << configPath.string() << endl;
-        revertToDefaultValues();
         writeConfig();
+        return;
     }
+    XmlTree group;
+
+#define GROUP_DEF(grp) try {group = tree.getChild(#grp);} catch (exception& e) {}
+#define ITEM_DEF(type, var, default)                        \
+    try                                                      \
+    {                                                       \
+        if (group.getTag().empty())                         \
+            var = tree.getChild(#var).getValue<type>();     \
+        else                                                \
+            var = group.getChild(#var).getValue<type>();    \
+    }                                                       \
+    catch (exception& e)                                    \
+    {                                                       \
+        console() << e.what() << endl;                      \
+    }
+
+#define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
+#include "item.def"
+#undef ITEM_DEF_MINMAX
+#undef ITEM_DEF
+#undef GROUP_DEF
+    console() << "Reads from " << configPath.string() << endl;
 }
 
 void writeConfig()
