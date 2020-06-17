@@ -11,10 +11,13 @@ using ci::quat;
 using ci::Color;
 using ci::ColorA;
 
+#define ITEM_DEF_FILE "item.def"
+#define CONFIG_XML "MiniConfig.xml"
+
 #define GROUP_DEF(grp)
 #define ITEM_DEF(type, var, default) extern type var;
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
-#include "item.def"
+#include ITEM_DEF_FILE
 #undef ITEM_DEF_MINMAX
 #undef ITEM_DEF
 #undef GROUP_DEF

@@ -102,17 +102,12 @@ namespace vnm
     void drawMinicofigImgui(bool createNewWindow = false)
     {
         if (createNewWindow)
-            ImGui::Begin("Config");
+            ImGui::Begin(CONFIG_XML);
 
         if (ImGui::Button("Save Config"))
         {
             writeConfig();
         }
-        if (ImGui::Button("Remotery Profiler"))
-        {
-            launchWebBrowser(Url(getAssetPath("vis/index.html").string(), true));
-        }
-
         if (ImGui::Button("Screen-shot"))
         {
             takeScreenShot();
@@ -134,7 +129,7 @@ namespace vnm
 #define ITEM_DEF(type, var, default)        addImguiParam(#var, var);
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max)  addImguiParam(#var, var, Min, Max);
         if (true) {
-#include "item.def"
+#include ITEM_DEF_FILE
         }
 #undef ITEM_DEF_MINMAX
 #undef ITEM_DEF
@@ -147,8 +142,8 @@ namespace vnm
 
 void createConfigImgui(WindowRef window = getWindow(), bool autoDraw = true)
 {
-    auto optiion = ImGui::Options().window(window);
-    ImGui::Initialize(optiion);
+    auto option = ImGui::Options().window(window);
+    ImGui::Initialize(option);
     if (autoDraw)
         App::get()->getSignalUpdate().connect([] {vnm::drawMinicofigImgui(true); });
 }

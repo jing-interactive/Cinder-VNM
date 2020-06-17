@@ -16,19 +16,14 @@ using namespace std;
 #define GROUP_DEF(grp)
 #define ITEM_DEF(type, var, default) type var = default;
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
-#include "item.def"
+#include ITEM_DEF_FILE
 #undef ITEM_DEF_MINMAX
 #undef ITEM_DEF
 #undef GROUP_DEF
 
-namespace
-{
-    const string kConfigFileName = "MiniConfig.xml";
-}
-
 void readConfig()
 {
-    fs::path configPath = app::getAppPath() / kConfigFileName;
+    fs::path configPath = app::getAppPath() / CONFIG_XML;
     try
     {
         XmlTree tree(loadFile(configPath));
@@ -44,7 +39,7 @@ void readConfig()
             var = group.getChild(#var).getValue<type>();    \
     } while (0);
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
-#include "item.def"
+#include ITEM_DEF_FILE
 #undef ITEM_DEF_MINMAX
 #undef ITEM_DEF
 #undef GROUP_DEF
@@ -66,7 +61,7 @@ void writeConfig()
     return;
 #endif
 
-    fs::path configPath = app::getAppPath() / kConfigFileName;
+    fs::path configPath = app::getAppPath() / CONFIG_XML;
     try
     {
         XmlTree tree = XmlTree::createDoc();
@@ -87,7 +82,7 @@ void writeConfig()
             else group.push_back(item);                         \
         } while (0);
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
-#include "item.def"
+#include ITEM_DEF_FILE
 #undef ITEM_DEF_MINMAX
 #undef ITEM_DEF
 #undef GROUP_DEF
@@ -113,7 +108,7 @@ void revertToDefaultValues()
 #define GROUP_DEF(grp)
 #define ITEM_DEF(type, var, default) var = default;
 #define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
-#include "item.def"
+#include ITEM_DEF_FILE
 #undef ITEM_DEF_MINMAX
 #undef ITEM_DEF
 #undef GROUP_DEF
@@ -160,7 +155,7 @@ namespace
     #define GROUP_DEF(grp)                  height += kPODItemHeight;
     #define ITEM_DEF(type, var, default)    height += getItemHeight(var);
     #define ITEM_DEF_MINMAX(type, var, default, Min, Max) ITEM_DEF(type, var, default);
-    #include "item.def"
+    #include ITEM_DEF_FILE
     #undef ITEM_DEF_MINMAX
     #undef ITEM_DEF
     #undef GROUP_DEF
@@ -185,7 +180,7 @@ shared_ptr<params::InterfaceGl> createConfigUI(const ivec2& size)
 #if defined(CINDER_MSW_DESKTOP) || defined(CINDER_LINUX) || defined(CINDER_MAC)
     ivec2 newsize = {size.x, max(size.y, getConfigUIHeight()) };
     
-    auto params = params::InterfaceGl::create("MiniConfig", newsize);
+    auto params = params::InterfaceGl::create("MiniConfig.xml", newsize);
     params->addButton("SAVE", writeConfig);
     params->addButton("PROFILER", [] {
         launchWebBrowser(Url(getAssetPath("vis/index.html").string(), true));
@@ -203,7 +198,7 @@ do                                                          \
 type step = (Max - Min) / (type)500;                        \
 params->addParam(#var, &var).min(Min).max(Max).step(step).group(groupName);  \
 } while(0);
-#include "item.def"
+#include ITEM_DEF_FILE
 #undef ITEM_DEF_MINMAX
 #undef ITEM_DEF
 #undef GROUP_DEF
