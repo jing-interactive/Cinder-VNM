@@ -5,7 +5,7 @@
 #include "cinder/Log.h"
 
 #include "AssetManager.h"
-#include "MiniConfig.h"
+#include "MiniConfigImgui.h"
 #include "DepthSensor.h"
 
 using namespace ci;
@@ -34,8 +34,8 @@ struct _TBOX_PREFIX_App : public App
         });
 
         mCamUi = CameraUi( &mCam, getWindow(), -1 );
-        
-        createConfigUI({200, 200});
+
+        createConfigImgui();
         gl::enableDepth();
     
         getWindow()->getSignalResize().connect([&] {

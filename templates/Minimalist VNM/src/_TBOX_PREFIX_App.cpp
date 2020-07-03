@@ -5,7 +5,7 @@
 #include "cinder/Log.h"
 
 #include "AssetManager.h"
-#include "MiniConfig.h"
+#include "MiniConfigImgui.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -20,8 +20,8 @@ struct _TBOX_PREFIX_App : public App
         auto aabb = am::triMesh(MESH_NAME)->calcBoundingBox();
         mCam.lookAt(aabb.getMax() * 2.0f, aabb.getCenter());
         mCamUi = CameraUi( &mCam, getWindow(), -1 );
-        
-        createConfigUI({200, 200});
+
+        createConfigImgui();
         gl::enableDepth();
 
         getWindow()->getSignalResize().connect([&] {

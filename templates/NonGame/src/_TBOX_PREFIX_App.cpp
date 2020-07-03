@@ -4,7 +4,7 @@
 #include "cinder/Log.h"
 
 #include "AssetManager.h"
-#include "MiniConfig.h"
+#include "MiniConfigImgui.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -15,8 +15,8 @@ struct _TBOX_PREFIX_App : public App
     void setup() override
     {
         log::makeLogger<log::LoggerFileRotating>(fs::path(), "IG.%Y.%m.%d.log");
-        createConfigUI({200, 200});
-    
+        createConfigImgui();
+
         getWindow()->getSignalKeyUp().connect([&](KeyEvent& event) {
             if (event.getCode() == KeyEvent::KEY_ESCAPE) quit();
         });
