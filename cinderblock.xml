@@ -11,6 +11,7 @@
 	<sourcePattern>src/*.*</sourcePattern>
 	<headerPattern>include/*.*</headerPattern>
 	<includePath>include</includePath>
+	<includePath>ui</includePath>
 	<includePath>../</includePath>
 </block>
 <template>templates/Basic VNM/template.xml</template>
