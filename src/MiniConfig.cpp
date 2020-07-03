@@ -23,7 +23,7 @@ using namespace std;
 
 void readConfig()
 {
-    fs::path configPath = app::getAppPath() / ITEM_DEF_FILE;
+    fs::path configPath = app::getAppPath() / CONFIG_XML;
     XmlTree tree;
     try
     {
