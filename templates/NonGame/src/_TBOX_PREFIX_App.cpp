@@ -21,6 +21,11 @@ struct _TBOX_PREFIX_App : public App
             if (event.getCode() == KeyEvent::KEY_ESCAPE) quit();
         });
 
+        getWindow()->getSignalResize().connect([&]{
+            APP_WIDTH = getWindowWidth();
+            APP_HEIGHT = getWindowHeight();
+        });
+
         getSignalCleanup().connect([&] { writeConfig(); });
         
         getWindow()->getSignalDraw().connect([&] {

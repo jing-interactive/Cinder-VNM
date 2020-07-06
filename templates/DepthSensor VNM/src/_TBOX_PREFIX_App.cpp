@@ -37,8 +37,10 @@ struct _TBOX_PREFIX_App : public App
 
         createConfigImgui();
         gl::enableDepth();
-    
+
         getWindow()->getSignalResize().connect([&] {
+            APP_WIDTH = getWindowWidth();
+            APP_HEIGHT = getWindowHeight();
             mCam.setAspectRatio( getWindowAspectRatio() );
         });
 
