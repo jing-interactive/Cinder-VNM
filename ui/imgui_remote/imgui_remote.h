@@ -260,7 +260,7 @@ namespace ImGui {
 				else if ( strstr( (char *) data, "ImClipboard=" ) )
 				{
 					char *clipboard = &( (char *) data )[ strlen( "ImClipboard=" ) ];
-					ImGui::GetIO().SetClipboardTextFn( clipboard );
+					ImGui::GetIO().SetClipboardTextFn( NULL, clipboard );
 				}
 				break;
 				// Binary message
