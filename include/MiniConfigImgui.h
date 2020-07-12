@@ -1,8 +1,7 @@
 #pragma once
 
 #include "MiniConfig.h"
-#include <cinder/CinderImGui.h>
-
+#include <Cinder/CinderImGui.h>
 #include <cinder/Utilities.h>
 #include <cinder/app/App.h>
 
@@ -15,7 +14,7 @@ namespace vnm
     void drawFrameTime()
     {
         ImGuiIO& io = ImGui::GetIO();
-        static float values[600] = {};
+        static float values[300] = {};
         static int values_offset = 0;
         values[values_offset] = io.DeltaTime * 1000;
         values_offset = (values_offset + 1) % IM_ARRAYSIZE(values);
@@ -24,20 +23,54 @@ namespace vnm
 
     bool addImguiParam(const char* label, int& v)
     {
-        return ImGui::DragInt(label, &v);
+        ImGuiInputTextFlags flags = 0;
+        if (label[0] == '_') flags = ImGuiInputTextFlags_ReadOnly;
+        return ImGui::InputInt(label, &v, 1, 100, flags);
     }
 
     bool addImguiParam(const char* label, float& v)
     {
-        return ImGui::DragFloat(label, &v);
+        ImGuiInputTextFlags flags = 0;
+        if (label[0] == '_') flags = ImGuiInputTextFlags_ReadOnly;
+        return ImGui::InputFloat(label, &v, 0, 0, "%.3f", flags);
+    }
+
+    bool addImguiParam(const char* label, double& v)
+    {
+        ImGuiInputTextFlags flags = 0;
+        if (label[0] == '_') flags = ImGuiInputTextFlags_ReadOnly;
+        return ImGui::InputDouble(label, &v, 0, 0, "%.6f", flags);
     }
 
     bool addImguiParam(const char* label, float& v, float min, float max)
     {
-        return ImGui::SliderFloat(label, &v, min, max);
+        v = std::max(std::min(v, max), min);
+        return ImGui::DragFloat(label, &v, 1.0f, min, max);
+    }
+
+    bool addImguiParam(const char* label, double& v, double min, double max)
+    {
+        v = std::max(std::min(v, max), min);
+        return ImGui::DragScalar(label, ImGuiDataType_Double, &v, 1.0f, &min, &max, "%.8f");
     }
 
     bool addImguiParam(const char* label, int& v, int min, int max)
+    {
+        v = std::max(std::min(v, max), min);
+        return ImGui::DragInt(label, &v, 1.0f, min, max);
+    }
+
+    bool addImguiParamSlider(const char* label, float& v, float min, float max)
+    {
+        return ImGui::SliderFloat(label, &v, min, max);
+    }
+
+    bool addImguiParamSlider(const char* label, double& v, double min, double max)
+    {
+        return ImGui::SliderScalar(label, ImGuiDataType_Double, &v, &min, &max, "%.8f");
+    }
+
+    bool addImguiParamSlider(const char* label, int& v, int min, int max)
     {
         return ImGui::SliderInt(label, &v, min, max);
     }
@@ -45,6 +78,11 @@ namespace vnm
     bool addImguiParam(const char* label, bool& v)
     {
         return ImGui::Checkbox(label, &v);
+    }
+
+    bool addImguiParamRadio(const char* label, int& v, int v_button)
+    {
+        return ImGui::RadioButton(label, &v, v_button);
     }
 
     bool addImguiParam(const char* label, string& v)
@@ -108,6 +146,7 @@ namespace vnm
         {
             writeConfig();
         }
+
         if (ImGui::Button("Screen-shot"))
         {
             takeScreenShot();
@@ -125,13 +164,20 @@ namespace vnm
             ImGui::ShowDemoWindow(&isDemoWindowOpened);
 #endif  
         
-#define GROUP_DEF(grp)                      } if (ImGui::CollapsingHeader(#grp, ImGuiTreeNodeFlags_DefaultOpen)) {
+#define GROUP_DEF(grp)                      } if (ImGui::CollapsingHeader(#grp, #grp[0] == '_' ? ImGuiTreeNodeFlags_CollapsingHeader : ImGuiTreeNodeFlags_DefaultOpen)) {
 #define ITEM_DEF(type, var, default)        addImguiParam(#var, var);
-#define ITEM_DEF_MINMAX(type, var, default, Min, Max)  addImguiParam(#var, var, Min, Max);
-        if (true) {
-#include ITEM_DEF_FILE
+#define ITEM_DEF_DIGIT(type, var, default, Min, Max)   addImguiParam(#var, var, Min, Max);
+#define ITEM_DEF_MINMAX(type, var, default, Min, Max)  addImguiParamSlider(#var, var, Min, Max);
+#define ITEM_DEF_RADIO(label, var, button)             addImguiParamRadio(#label, var, button);
+#define GROUP_DEF_RADIO(var, default)
+        if (true)
+        {
+#include "item.def"
         }
+#undef GROUP_DEF_RADIO
+#undef ITEM_DEF_RADIO
 #undef ITEM_DEF_MINMAX
+#undef ITEM_DEF_DIGIT
 #undef ITEM_DEF
 #undef GROUP_DEF
 
