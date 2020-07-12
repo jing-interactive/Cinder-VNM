@@ -140,9 +140,11 @@ namespace vnm
     }
 }
 
-void createConfigImgui(WindowRef window = getWindow(), bool autoDraw = true)
+//! autoDraw: Specify whether the block should call vnm::drawMinicofigImgui automatically. Default to true.
+//! autoRender: Specify whether the block should call ImGui::NewFrame and ImGui::Render automatically. Default to true.
+void createConfigImgui(WindowRef window = getWindow(), bool autoDraw = true, bool autoRender = true)
 {
-    auto option = ImGui::Options().window(window);
+    auto option = ImGui::Options().window(window).autoRender(autoRender);
     ImGui::Initialize(option);
     if (autoDraw)
         App::get()->getSignalUpdate().connect([] {vnm::drawMinicofigImgui(true); });
