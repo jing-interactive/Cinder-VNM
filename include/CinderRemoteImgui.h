@@ -12,8 +12,8 @@ setup():
 
     getSignalUpdate().connect([&] {
         ImGui_ImplCinder_NewFrameGuard(getWindow());
-        vnm::drawMinicofigImgui(true);
         updateRemoteImgui(ENABLE_REMOTE_GUI);
+        vnm::drawMinicofigImgui(true);
     });
 
     getWindow()->getSignalDraw().connect([&] {
