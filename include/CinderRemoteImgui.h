@@ -11,8 +11,8 @@ setup():
     createRemoteImgui(REMOTE_GUI_IP.c_str());
 
     getSignalUpdate().connect([&] {
-        ImGui_ImplCinder_NewFrameGuard(getWindow());
         updateRemoteImgui(ENABLE_REMOTE_GUI);
+        ImGui_ImplCinder_NewFrameGuard(getWindow());
         vnm::drawMinicofigImgui(true);
     });
 
