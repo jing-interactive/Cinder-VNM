@@ -35,7 +35,10 @@ struct _TBOX_PREFIX_App : public App
         getWindow()->getSignalKeyUp().connect([&](KeyEvent& event) {
             if (event.getCode() == KeyEvent::KEY_ESCAPE) quit();
         });
-        
+
+        getSignalUpdate().connect([&] {
+        });
+
         mGlslProg = am::glslProg(VS_NAME, FS_NAME);
         mGlslProg->uniform("uTex0", 0);
         mGlslProg->uniform("uTex1", 1);

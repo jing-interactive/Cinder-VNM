@@ -43,6 +43,9 @@ struct _TBOX_PREFIX_App : public App
         mGlslProg->uniform("uTex2", 2);
         mGlslProg->uniform("uTex3", 3);
 
+        getSignalUpdate().connect([&] {
+        });
+
         getWindow()->getSignalDraw().connect([&] {
             gl::setMatrices(mCam);
             gl::clear();

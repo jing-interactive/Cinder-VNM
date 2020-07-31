@@ -26,6 +26,9 @@ struct _TBOX_PREFIX_App : public App
             APP_HEIGHT = getWindowHeight();
         });
 
+        getSignalUpdate().connect([&] {
+        });
+
         getSignalCleanup().connect([&] { writeConfig(); });
         
         getWindow()->getSignalDraw().connect([&] {
