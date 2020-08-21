@@ -102,6 +102,7 @@ enum ImPlotStyleVar_ {
     ImPlotStyleVar_ErrorBarWeight,   // float, error bar whisker weight in pixels
     ImPlotStyleVar_DigitalBitHeight, // float, digital channels bit height (at 1) in pixels
     ImPlotStyleVar_DigitalBitGap,    // float, digital channels bit padding gap in pixels
+    ImPlotStyleVar_PlotPadding,      // ImVec2, padding between widget frame and plot area and/or labels
     ImPlotStyleVar_COUNT
 };
 
@@ -151,8 +152,9 @@ struct ImPlotPoint {
 struct ImPlotRange {
     double Min, Max;
     ImPlotRange();
-    bool Contains(double value) const { return value >= Min && value <= Max; };
-    double Size() const               { return Max - Min; };
+    ImPlotRange(double _min, double _max) { Min = _min; Max = _max; }
+    bool Contains(double value) const     { return value >= Min && value <= Max; };
+    double Size() const                   { return Max - Min; };
 };
 
 // Combination of two ranges for X and Y axes.
@@ -173,6 +175,7 @@ struct ImPlotStyle {
     float        ErrorBarWeight;          // = 1.5, error bar whisker weight in pixels
     float        DigitalBitHeight;        // = 8, digital channels bit height (at y = 1.0f) in pixels
     float        DigitalBitGap;           // = 4, digital channels bit padding gap in pixels
+    ImVec2       PlotPadding;             // = (8,8), padding between widget frame and plot area and/or labels
     ImVec4       Colors[ImPlotCol_COUNT]; // array of plot specific colors
     ImPlotStyle();
 };
@@ -258,10 +261,12 @@ void PlotScatter(const char* label_id, const ImPlotPoint* data, int count, int o
 void PlotScatter(const char* label_id, ImPlotPoint (*getter)(void* data, int idx), void* data, int count, int offset = 0);
 
 // Plots a shaded (filled) region between two lines, or a line and a horizontal reference.
-void PlotShaded(const char* label_id, const float* xs, const float* ys1, const float* ys2, int count, int offset = 0, int stride = sizeof(float));
-void PlotShaded(const char* label_id, const double* xs, const double* ys1, const double* ys2, int count, int offset = 0, int stride = sizeof(double));
+void PlotShaded(const char* label_id, const float* values, int count, float y_ref = 0, int offset = 0, int stride = sizeof(float));
+void PlotShaded(const char* label_id, const double* values, int count, double y_ref = 0, int offset = 0, int stride = sizeof(double));
 void PlotShaded(const char* label_id, const float* xs, const float* ys, int count, float y_ref = 0, int offset = 0, int stride = sizeof(float));
 void PlotShaded(const char* label_id, const double* xs, const double* ys, int count, double y_ref = 0, int offset = 0, int stride = sizeof(double));
+void PlotShaded(const char* label_id, const float* xs, const float* ys1, const float* ys2, int count, int offset = 0, int stride = sizeof(float));
+void PlotShaded(const char* label_id, const double* xs, const double* ys1, const double* ys2, int count, int offset = 0, int stride = sizeof(double));
 
 // Plots a vertical bar graph. #width and #shift are in X units.
 void PlotBars(const char* label_id, const float* values, int count, float width = 0.67f, float shift = 0, int offset = 0, int stride = sizeof(float));
@@ -355,6 +360,8 @@ void PopStyleColor(int count = 1);
 void PushStyleVar(ImPlotStyleVar idx, float val);
 // Temporarily modify a style variable of int type. Don't forget to call PopStyleVar!
 void PushStyleVar(ImPlotStyleVar idx, int val);
+// Temporarily modify a style variable of ImVec2 type. Don't forget to call PopStyleVar!
+void PushStyleVar(ImPlotStyleVar idx, const ImVec2& val);
 // Undo temporary style modification.
 void PopStyleVar(int count = 1);
 
@@ -381,6 +388,8 @@ void SetNextPlotLimits(double x_min, double x_max, double y_min, double y_max, I
 void SetNextPlotLimitsX(double x_min, double x_max, ImGuiCond cond = ImGuiCond_Once);
 // Set the Y axis range limits of the next plot. Call right before BeginPlot(). If ImGuiCond_Always is used, the Y axis limits will be locked.
 void SetNextPlotLimitsY(double y_min, double y_max, ImGuiCond cond = ImGuiCond_Once, int y_axis = 0);
+// Fits the next plot axes to all plotted data if they are unlocked (equivalent to double-clicks).
+void FitNextPlotAxes(bool x = true, bool y = true, bool y2 = true, bool y3 = true);
 
 // Set the X axis ticks and optionally the labels for the next plot.
 void SetNextPlotTicksX(const double* values, int n_ticks, const char** labels = NULL, bool show_default = false);

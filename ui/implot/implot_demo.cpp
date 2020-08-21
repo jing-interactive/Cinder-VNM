@@ -33,8 +33,11 @@
 
 namespace MyImPlot {
 
-// Example for Custom Plotters section. Plots a candlestick chart for financial data. See implementatoin at bottom. 
-void PlotCandlestick(const char* label_id, const double* xs, const double* opens, const double* closes, const double* lows, const double* highs, int count, float width_percent = 0.25f, ImVec4 bullCol = ImVec4(0,1,0,1), ImVec4 bearCol = ImVec4(1,0,0,1));
+// Example for Custom Plotters and Tooltips section. Plots a candlestick chart for financial data. See implementation at bottom. 
+void PlotCandlestick(const char* label_id, const double* xs, const double* opens, const double* closes, const double* lows, const double* highs, int count, bool tooltip = true, float width_percent = 0.25f, ImVec4 bullCol = ImVec4(0,1,0,1), ImVec4 bearCol = ImVec4(1,0,0,1));
+
+// Example for Tables section. Generates a quick and simple shaded line plot. See implementation at bottom. 
+void Sparkline(const char* id, const float* values, int count, float min_v, float max_v, int offset, const ImVec4& col, const ImVec2& size);
 
 }
 
@@ -165,7 +168,10 @@ void ShowDemoWindow(bool* p_open) {
         ImGui::Indent();
             ImGui::BulletText("Double left click on an axis to fit the individual axis.");
         ImGui::Unindent();
-        ImGui::BulletText("Double right click to open the plot context menu.");
+        ImGui::BulletText("Double right click to open the full plot context menu.");
+        ImGui::Indent();
+            ImGui::BulletText("Double right click on an axis to open the axis context menu.");
+        ImGui::Unindent();
         ImGui::BulletText("Click legend label icons to show/hide plot items.");
         ImGui::BulletText("IMPORTANT: By default, anti-aliased lines are turned OFF.");
         ImGui::Indent();
@@ -401,7 +407,7 @@ void ShowDemoWindow(bool* p_open) {
         ImGui::SameLine();
         ImGui::LabelText("##Colormap Index", "%s", cmap_names[map]);
         ImGui::SetNextItemWidth(225);
-        ImGui::DragFloat("Max",&scale_max,0.01f,0.1f,20);
+        ImGui::DragFloatRange2("Min / Max",&scale_min, &scale_max, 0.01f, -20, 20);
         static ImPlotAxisFlags axes_flags = ImPlotAxisFlags_LockMin | ImPlotAxisFlags_LockMax | ImPlotAxisFlags_TickLabels;
         static const char* xlabels[] = {"C1","C2","C3","C4","C5","C6","C7"};
         static const char* ylabels[] = {"R1","R2","R3","R4","R5","R6","R7"};
@@ -587,7 +593,7 @@ void ShowDemoWindow(bool* p_open) {
 
         static t_float xs[1001], xs2[1001], ys1[1001], ys2[1001], ys3[1001];
         static bool y2_axis = true;
-        static bool y3_axis = false;
+        static bool y3_axis = true;
         ImGui::Checkbox("Y-Axis 2", &y2_axis);
         ImGui::SameLine();
         ImGui::Checkbox("Y-Axis 3", &y3_axis);
@@ -597,6 +603,11 @@ void ShowDemoWindow(bool* p_open) {
         ImGui::ColorEdit4("##Col2", &y2_col.x, ImGuiColorEditFlags_NoInputs);
         ImGui::SameLine();
         ImGui::ColorEdit4("##Col3", &y3_col.x, ImGuiColorEditFlags_NoInputs);
+        // you can fit axes programatically 
+        ImGui::SameLine(); if (ImGui::Button("Fit X"))  ImPlot::FitNextPlotAxes(true, false, false, false);
+        ImGui::SameLine(); if (ImGui::Button("Fit Y"))  ImPlot::FitNextPlotAxes(false, true, false, false);
+        ImGui::SameLine(); if (ImGui::Button("Fit Y2")) ImPlot::FitNextPlotAxes(false, false, true, false);
+        ImGui::SameLine(); if (ImGui::Button("Fit Y3")) ImPlot::FitNextPlotAxes(false, false, false, true);
         for (int i = 0; i < 1001; ++i) {
             xs[i]  = (i*0.1f);
             ys1[i] = Sin(xs[i]) * 3 + 1;
@@ -762,7 +773,7 @@ void ShowDemoWindow(bool* p_open) {
             }
         }
         ImPlot::SetNextPlotLimitsX((double)t - 10, t, paused ? ImGuiCond_Once : ImGuiCond_Always);
-        if (ImPlot::BeginPlot("##DND", NULL, NULL, ImVec2(-1,0), ImPlotFlags_Legend | ImPlotFlags_Highlight | ImPlotFlags_BoxSelect | ImPlotFlags_ContextMenu | ImPlotFlags_NoChild | ImPlotFlags_YAxis2 | ImPlotFlags_YAxis3)) {
+        if (ImPlot::BeginPlot("##DND", NULL, NULL, ImVec2(-1,0), ImPlotFlags_Legend | ImPlotFlags_Highlight | ImPlotFlags_BoxSelect | ImPlotFlags_ContextMenu | ImPlotFlags_YAxis2 | ImPlotFlags_YAxis3)) {
             for (int i = 0; i < K_CHANNELS; ++i) {
                 if (show[i] && data[i].Data.size() > 0) {
                     char label[K_CHANNELS];
@@ -907,6 +918,45 @@ void ShowDemoWindow(bool* p_open) {
             ImGui::EndDragDropTarget();
         }
     }
+    if (ImGui::CollapsingHeader("Tables")) {
+#ifdef IMGUI_HAS_TABLE
+        static ImGuiTableFlags flags = ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_RowBg;
+        static bool anim = true;
+        static int offset = 0;
+        ImGui::BulletText("Plots can be used inside of ImGui tables.");
+        ImGui::Checkbox("Animate",&anim);
+        if (anim)
+            offset = (offset + 1) % 100;
+        if (ImGui::BeginTable("##table", 3, flags, ImVec2(-1,0))) { 
+            ImGui::TableSetupColumn("Electrode", ImGuiTableColumnFlags_WidthFixed, 75.0f);
+            ImGui::TableSetupColumn("Voltage", ImGuiTableColumnFlags_WidthFixed, 75.0f);
+            ImGui::TableSetupColumn("EMG Signal");
+            ImGui::TableAutoHeaders();
+            ImPlot::SetColormap(ImPlotColormap_Cool, 10);
+
+            for (int row = 0; row < 10; row++)
+            {
+                ImGui::TableNextRow();
+                static float data[100];
+                srand(row);
+                for (int i = 0; i < 100; ++i)
+                    data[i] = RandomRange(0,10);
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("EMG %d", row);
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("%.3f V", data[offset]);
+                ImGui::TableSetColumnIndex(2);
+                ImGui::PushID(row);
+                MyImPlot::Sparkline("##spark",data,100,0,11.0f,offset,ImPlot::GetColormapColor(row),ImVec2(-1, 35));
+                ImGui::PopID();
+            }
+            ImPlot::SetColormap(ImPlotColormap_Default);
+            ImGui::EndTable();
+        }
+#else
+    ImGui::BulletText("You need to merge the ImGui 'tables' branch for this section.");
+#endif
+    }
     //-------------------------------------------------------------------------
     if (ImGui::CollapsingHeader("Offset and Stride")) {
         static const int k_circles    = 11;
@@ -1012,7 +1062,7 @@ void ShowDemoWindow(bool* p_open) {
         }
     }
     //-------------------------------------------------------------------------
-    if (ImGui::CollapsingHeader("Custom Plotters")) {
+    if (ImGui::CollapsingHeader("Custom Plotters and Tooltips")) {
 
         ImGui::BulletText("You can create custom plotters or extend ImPlot using implot_internal.h.");
 
@@ -1021,13 +1071,14 @@ void ShowDemoWindow(bool* p_open) {
         double closes[] = {1283.35,1315.3,1326.1,1317.4,1321.5,1317.4,1323.5,1319.2,1321.3,1323.3,1319.7,1325.1,1323.6,1313.8,1282.05,1279.05,1314.2,1315.2,1310.8,1329.1,1334.5,1340.2,1340.5,1350,1347.1,1344.3,1344.6,1339.7,1339.4,1343.7,1337,1338.9,1340.1,1338.7,1346.8,1324.25,1329.55,1369.6,1372.5,1352.4,1357.6,1354.2,1353.4,1346,1341,1323.8,1311.9,1309.1,1312.2,1310.7};
         double lows[]   = {1282.85,1315,1318.7,1309.6,1317.6,1312.9,1312.4,1319.1,1319,1321,1318.1,1321.3,1319.9,1312,1280.5,1276.15,1308,1309.9,1308.5,1312.3,1329.3,1333.1,1340.2,1347,1345.9,1338,1340.8,1335,1332,1337.9,1333,1336.8,1333.2,1329.9,1340.4,1323.85,1324.05,1349,1366.3,1351.2,1349.1,1352.4,1350.7,1344.3,1338.9,1316.3,1308.4,1306.9,1309.6,1306.7};
         double highs[]  = {1284.75,1320.6,1327,1330.8,1326.8,1321.6,1326,1328,1325.8,1327.1,1326,1326,1323.5,1322.1,1282.7,1282.95,1315.8,1316.3,1314,1333.2,1334.7,1341.7,1353.2,1354.6,1352.2,1346.4,1345.7,1344.9,1340.7,1344.2,1342.7,1342.1,1345.2,1342,1350,1324.95,1330.75,1369.6,1374.3,1368.4,1359.8,1359,1357,1356,1353.4,1340.6,1322.3,1314.1,1316.1,1312.9};
-        
+        static bool tooltip = true;
+        ImGui::Checkbox("Show Tooltip", &tooltip);
         ImPlot::SetNextPlotLimits(0, 50, 1260, 1380);
         if (ImPlot::BeginPlot("Candlestick Chart","Day","USD")) {
-            MyImPlot::PlotCandlestick("GOOGL",dates, opens, closes, lows, highs, 50);
+            MyImPlot::PlotCandlestick("GOOGL",dates, opens, closes, lows, highs, 50, tooltip);
             ImPlot::EndPlot();
         }
-    }
+    }    
     //-------------------------------------------------------------------------
     if (ImGui::CollapsingHeader("Benchmark")) {
         static const int n_items = 100;
@@ -1071,7 +1122,7 @@ void ShowDemoWindow(bool* p_open) {
 
 namespace MyImPlot {
 
-void PlotCandlestick(const char* label_id, const double* xs, const double* opens, const double* closes, const double* lows, const double* highs, int count, float width_percent, ImVec4 bullCol, ImVec4 bearCol) {
+void PlotCandlestick(const char* label_id, const double* xs, const double* opens, const double* closes, const double* lows, const double* highs, int count, bool tooltip, float width_percent, ImVec4 bullCol, ImVec4 bearCol) {
     // get current implot context
     ImPlotContext* implot = ImPlot::GetCurrentContext();
     // register item
@@ -1106,6 +1157,47 @@ void PlotCandlestick(const char* label_id, const double* xs, const double* opens
     }
     // pop clip  rect for the current plot
     ImPlot::PopPlotClipRect();
+    // custom tool
+    if (!ImPlot::IsPlotHovered() || !tooltip)
+        return;
+    ImPlotPoint mouse   = ImPlot::GetPlotMousePos();
+    mouse.x             = round(mouse.x);
+    float  tool_l       = ImPlot::PlotToPixels(mouse.x - half_width * 1.5, mouse.y).x;
+    float  tool_r       = ImPlot::PlotToPixels(mouse.x + half_width * 1.5, mouse.y).x;
+    float  tool_t       = ImPlot::GetPlotPos().y;
+    float  tool_b       = tool_t + ImPlot::GetPlotSize().y;
+    ImPlot::PushPlotClipRect();
+    draw_list->AddRectFilled(ImVec2(tool_l, tool_t), ImVec2(tool_r, tool_b), IM_COL32(0,255,255,64));
+    ImPlot::PopPlotClipRect();
+    // render tool tip
+    for (int i = 0; i < count; ++i) {
+        if (xs[i] == mouse.x) {
+            ImGui::BeginTooltip();
+            ImGui::Text("Day:   %.0f", xs[i]);
+            ImGui::Text("Open:  $%.2f",  opens[i]);
+            ImGui::Text("Close: $%.2f", closes[i]);
+            ImGui::Text("Low:   $%.2f",   lows[i]);
+            ImGui::Text("High:  $%.2f",  highs[i]);
+            ImGui::EndTooltip();
+            break;
+        }
+    }
+}
+
+// Example for Tables section. Generates a quick and simple shaded line plot. See implementation at bottom. 
+void Sparkline(const char* id, const float* values, int count, float min_v, float max_v, int offset, const ImVec4& col, const ImVec2& size) {
+    ImPlot::PushStyleVar(ImPlotStyleVar_PlotPadding, ImVec2(0,0));
+    ImPlot::SetNextPlotLimits(0, count - 1, min_v, max_v, ImGuiCond_Always);
+    if (ImPlot::BeginPlot(id,0,0,size,ImPlotFlags_NoChild,0,0,0,0)) {
+        ImPlot::PushStyleColor(ImPlotCol_Line, col);
+        ImPlot::PlotLine(id, values, count, offset);
+        ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.25f);
+        ImPlot::PlotShaded(id, values, count, 0, offset);
+        ImPlot::PopStyleVar();
+        ImPlot::PopStyleColor();
+        ImPlot::EndPlot();
+    }
+    ImPlot::PopStyleVar();
 }
 
 }
