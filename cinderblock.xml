@@ -14,7 +14,7 @@
 	<includePath>ui</includePath>
 	<includePath>../</includePath>
 </block>
-<template>templates/Basic VNM/template.xml</template>
+<template>templates/Melo Scene/template.xml</template>
 <template>templates/Minimalist VNM/template.xml</template>
 <template>templates/DepthSensor VNM/template.xml</template>
 <template>templates/NonGame/template.xml</template>
