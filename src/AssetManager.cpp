@@ -340,16 +340,26 @@ namespace am
         auto label = fs::path(vsFileName).filename().string() + "/" + fs::path(fsFileName).filename().string();
         auto loader = [=, &format](const string & vsAbsoluteName, const string & fsAbsoluteName) -> gl::GlslProgRef
         {
-            if (vsAbsoluteName == fsAbsoluteName || fsAbsoluteName == "")
+            if (vsAbsoluteName == fsAbsoluteName || fsAbsoluteName.empty())
             {
                 // Assume it's a stock shader
                 auto def = gl::ShaderDef();
-                if (vsAbsoluteName.find("texture") != string::npos) def = def.texture();
-                if (vsAbsoluteName.find("color") != string::npos) def = def.color();
-                if (vsAbsoluteName.find("lambert") != string::npos) def = def.lambert();
-                if (vsAbsoluteName.find("uniform") != string::npos) def = def.uniformBasedPosAndTexCoord();
+                bool isStockShader = false;
+                if (vsAbsoluteName.find("texture") != string::npos) {
+                    isStockShader = true; def = def.texture();
+                }
+                if (vsAbsoluteName.find("color") != string::npos) {
+                    isStockShader = true;  def = def.color();
+                }
+                if (vsAbsoluteName.find("lambert") != string::npos) {
+                    isStockShader = true; def = def.lambert();
+                }
+                if (vsAbsoluteName.find("uniform") != string::npos) {
+                    isStockShader = true; def = def.uniformBasedPosAndTexCoord();
+                }
 
-                return gl::getStockShader(def);
+                if (isStockShader)
+                    return gl::getStockShader(def);
             }
 
 #if defined( CINDER_GL_ES )
@@ -357,8 +367,10 @@ namespace am
 #else
             format.version(150); // gl 3.2
 #endif
-            format.vertex(DataSourcePath::create(vsAbsoluteName));
-            format.fragment(DataSourcePath::create(fsAbsoluteName));
+            if (!vsAbsoluteName.empty())
+                format.vertex(DataSourcePath::create(vsAbsoluteName));
+            if (!fsAbsoluteName.empty())
+                format.fragment(DataSourcePath::create(fsAbsoluteName));
             format.setLabel(label);
 
             return gl::GlslProg::create(format);
