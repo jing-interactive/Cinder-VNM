@@ -12,6 +12,7 @@
 	<headerPattern>include/*.*</headerPattern>
 	<includePath>include</includePath>
 	<includePath>ui</includePath>
+	<includePath>ui/implot</includePath>
 	<includePath>../</includePath>
 </block>
 <template>templates/Melo Scene/template.xml</template>
