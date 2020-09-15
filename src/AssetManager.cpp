@@ -166,7 +166,8 @@ namespace am
                 return T::create(source, _format);
             }
 
-            auto ext = fs::path(absoluteName).extension();
+            auto ext = fs::path(absoluteName).extension().string();
+            std::transform(ext.begin(), ext.end(), ext.begin(), static_cast<int(*)(int)>(tolower));
 #if !defined( CINDER_GL_ES ) || defined( CINDER_GL_ANGLE )
             if (ext == ".dds")
             {
@@ -283,9 +284,10 @@ namespace am
             ENTRY(WireTorus);
 #undef ENTRY
             auto source = DataSourcePath::create(absObjFileName);
-            auto ext = fs::path(absObjFileName).extension();
+            auto ext = fs::path(absObjFileName).extension().string();
             TriMeshRef mesh;
 
+            std::transform(ext.begin(), ext.end(), ext.begin(), static_cast<int(*)(int)>(tolower));
             if (ext == ".obj")
             {
                 if (absMtlFileName.empty())
