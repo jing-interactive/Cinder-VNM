@@ -347,6 +347,9 @@ namespace am
                 // Assume it's a stock shader
                 auto def = gl::ShaderDef();
                 bool isStockShader = false;
+                if (vsAbsoluteName.find("passthrough") != string::npos) {
+                    isStockShader = true;
+                }
                 if (vsAbsoluteName.find("texture") != string::npos) {
                     isStockShader = true; def = def.texture();
                 }
