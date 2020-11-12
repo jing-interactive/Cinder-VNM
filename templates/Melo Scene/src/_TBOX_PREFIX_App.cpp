@@ -50,6 +50,12 @@ struct _TBOX_PREFIX_App : public App
 
         getSignalUpdate().connect([&] {
             mRoot->treeUpdate();
+
+            for (auto& child : mRoot->getChildren())
+            {
+                //mModel->flipV = FLIP_V;
+                child->cameraPosition = mCam.getEyePoint();
+            }
         });
 
         getWindow()->getSignalDraw().connect([&] {
