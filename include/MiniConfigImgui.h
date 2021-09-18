@@ -140,22 +140,35 @@ namespace vnm
     void drawMinicofigImgui(bool createNewWindow = false)
     {
         if (createNewWindow)
-            ImGui::Begin(CONFIG_XML);
+            ImGui::Begin(CONFIG_XML, NULL, ImGuiWindowFlags_AlwaysAutoResize);
 
-        if (ImGui::Button("Save Config"))
+        if (ImGui::Button("Save"))
         {
             writeConfig();
         }
 
-        if (ImGui::Button("Screen-shot"))
+        ImGui::SameLine();
+        if (ImGui::Button("Screenshot"))
         {
             takeScreenShot();
         }
+
+        ImGui::SameLine();
         if (ImGui::Button("Quit"))
         {
             App::get()->quit();
         }
         
+        auto profilerHtml = getAssetPath("webui_remotery/index.html");
+        if (fs::exists(profilerHtml))
+        {
+            ImGui::SameLine();
+            if (ImGui::Button("Profiler"))
+            {
+                launchWebBrowser(Url(profilerHtml.string(), true));
+            }
+        }
+
 #if !defined(NDEBUG) && !defined(IMGUI_DISABLE_DEMO_WINDOWS)
         static bool isDemoWindowOpened = false;
         if (ImGui::Button("ShowDemoWindow"))
@@ -190,7 +203,10 @@ namespace vnm
 //! autoRender: Specify whether the block should call ImGui::NewFrame and ImGui::Render automatically. Default to true.
 void createConfigImgui(WindowRef window = getWindow(), bool autoDraw = true, bool autoRender = true)
 {
-    auto option = ImGui::Options().window(window).autoRender(autoRender);
+    auto option = ImGui::Options()
+        .window(window)
+        .autoRender(autoRender)
+        .iniPath(App::get()->getAppPath() / "imgui.ini");
     ImGui::Initialize(option);
     if (autoDraw)
         App::get()->getSignalUpdate().connect([] {vnm::drawMinicofigImgui(true); });
