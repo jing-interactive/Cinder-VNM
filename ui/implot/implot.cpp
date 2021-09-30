@@ -3200,17 +3200,17 @@ const ImVec4* GetColormap(ImPlotColormap colormap, int* size_out) {
         ImVec4(1.0000f,    1.0000f,    0.6667f, 1.0f),
         ImVec4(1.0000f,    1.0000f,    1.0000f, 1.0f),
         // ImPlotColormap_Cool
-        ImVec4(    0.f,    1.0000f,    1.0000f, 1.0f),
-        ImVec4(0.1000f,    0.9000f,    1.0000f, 1.0f),
-        ImVec4(0.2000f,    0.8000f,    1.0000f, 1.0f),
-        ImVec4(0.3000f,    0.7000f,    1.0000f, 1.0f),
-        ImVec4(0.4000f,    0.6000f,    1.0000f, 1.0f),
-        ImVec4(0.5000f,    0.5000f,    1.0000f, 1.0f),
-        ImVec4(0.6000f,    0.4000f,    1.0000f, 1.0f),
-        ImVec4(0.7000f,    0.3000f,    1.0000f, 1.0f),
-        ImVec4(0.8000f,    0.2000f,    1.0000f, 1.0f),
-        ImVec4(0.9000f,    0.1000f,    1.0000f, 1.0f),
-        ImVec4(1.0000f,        0.f,    1.0000f, 1.0f),
+        ImVec4(0.f, 1.0000f, 1.0000f, 1.0f),
+        ImVec4(0.890196f, 0.101961f, 0.109804f, 1.0f),
+        ImVec4(0.992157f, 0.749020f, 0.435294f, 1.0f),
+        ImVec4(0.984314f, 0.603922f, 0.600000f, 1.0f),
+        ImVec4(0.2000f, 0.8000f, 1.0000f, 1.0f),
+        ImVec4(0.4000f, 0.6000f, 1.0000f, 1.0f),
+        ImVec4(0.6000f, 0.4000f, 1.0000f, 1.0f),
+        ImVec4(0.7000f, 0.3000f, 1.0000f, 1.0f),
+        ImVec4(0.8000f, 0.2000f, 1.0000f, 1.0f),
+        ImVec4(0.9000f, 0.1000f, 1.0000f, 1.0f),
+        ImVec4(1.0000f, 0.f, 1.0000f, 1.0f),
         // ImPlotColormap_Pink
         ImVec4(0.2887f,        0.f,        0.f, 1.0f),
         ImVec4(0.4830f,    0.2582f,    0.2582f, 1.0f),
@@ -3234,7 +3234,7 @@ const ImVec4* GetColormap(ImPlotColormap colormap, int* size_out) {
         ImVec4(1.0000f,    1.0000f,        0.f, 1.0f),
         ImVec4(1.0000f,    0.6667f,        0.f, 1.0f),
         ImVec4(1.0000f,    0.3333f,        0.f, 1.0f),
-        ImVec4(1.0000f,        0.f,        0.f, 1.0f)
+        ImVec4(1.0000f,        0.f,        0.f, 1.0f),
     };
     *size_out =  csizes[colormap];
     return &cdata[coffs.Offsets[colormap]];
