@@ -4,6 +4,7 @@
 #include <Cinder/CinderImGui.h>
 #include <cinder/Utilities.h>
 #include <cinder/app/App.h>
+#include <imgui/imgui_stdlib.h>
 
 using namespace ci;
 using namespace ci::app;
