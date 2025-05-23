@@ -24,7 +24,7 @@
 #pragma once
 
 #if ! defined( IMGUI_USER_CONFIG )
-#define IMGUI_USER_CONFIG "cinder/CinderImGuiConfig.h"
+#define IMGUI_USER_CONFIG "CinderImGuiConfig.h"
 #endif
 #if ! defined( CINDER_IMGUI_EXTERNAL )
 #include "imgui/imgui.h"
