@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MiniConfig.h"
-#include "CinderImGui.h"
+#include <cinder/CinderImGui.h>
 #include <cinder/Utilities.h>
 #include <cinder/app/App.h>
 #include "imgui/imgui_stdlib.h"
